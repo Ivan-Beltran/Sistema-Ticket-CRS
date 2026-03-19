@@ -29,4 +29,9 @@ class Department extends Model
     {
         return $this->hasMany(Division::class);
     }
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }

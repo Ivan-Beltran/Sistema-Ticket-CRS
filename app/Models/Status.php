@@ -5,18 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class SlaPlan extends Model
+class Status extends Model
 {
     protected $fillable = [
-        'name',
-        'grace_time_hours',
-        'working_hours'
+        'name'
     ];
-
-    public function helpTopics()
-    {
-        return $this->hasMany(HelpTopic::class, 'division_id');
-    }
 
     public function tickets(): HasMany
     {
