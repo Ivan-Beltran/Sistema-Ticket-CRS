@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ticket extends Model
 {
     use SoftDeletes;
-    
+
     protected $fillable = [
         'code',
         'creation_date',
@@ -70,9 +71,9 @@ class Ticket extends Model
         return $this->belongsTo(Status::class); // asume 'status_id'
     }
 
-    public function qualifications():HasMany
+    public function qualification():HasOne
     {
-        return $this->hasMany(Qualification::class);
+        return $this->hasOne(Qualification::class);
     }
 
     public function ticketSolutions(): HasMany
@@ -83,5 +84,25 @@ class Ticket extends Model
     public function histories():HasMany
     {
         return $this->hasMany(TicketHistory::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * EVENTOS DEL MODELO: Cascada lógica para SoftDeletes
+     */
+    protected static function booted(): void
+    {
+        // Al eliminar el ticket...
+        static::deleting(function ($ticket) {
+            $ticket->ticketSolutions()->delete();
+            $ticket->histories()->delete();
+            $ticket->qualification()->delete();
+        });
+
+        // Al restaurar el ticket...
+        static::restoring(function ($ticket) {
+            $ticket->ticketSolutions()->withTrashed()->restore();
+            $ticket->histories()->withTrashed()->restore();
+            $ticket->qualification()->withTrashed()->restore();
+        });
     }
 }
