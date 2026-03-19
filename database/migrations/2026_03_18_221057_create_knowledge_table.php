@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('content_response',255);
             $table->date('creation_date');
             $table->foreignIdFor(Category::class)->constrained();
+             $table->softDeletes();
             $table->timestamps();
         });
     }

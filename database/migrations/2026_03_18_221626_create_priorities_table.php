@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->string('color', 7)->default('#cccccc');
             $table->tinyInteger('level')->unique();
+             $table->softDeletes();
             $table->timestamps();
         });
     }

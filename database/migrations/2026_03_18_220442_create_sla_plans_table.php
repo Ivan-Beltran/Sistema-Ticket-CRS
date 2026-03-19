@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->integer('grace_time_hours');
             $table->tinyInteger('working_hours');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

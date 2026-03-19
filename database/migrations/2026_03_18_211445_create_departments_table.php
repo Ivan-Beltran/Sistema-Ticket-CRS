@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('email_department', 100);
             $table->foreignIdFor(Area::class)->constrained();
+             $table->softDeletes();
             $table->timestamps();
         });
     }

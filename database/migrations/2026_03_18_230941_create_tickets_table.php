@@ -34,6 +34,7 @@ return new class extends Migration
             $table->foreignIdFor(SlaPlan::class)->constrained();
             $table->foreignIdFor(Department::class)->constrained();
             $table->foreignIdFor(Status::class)->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

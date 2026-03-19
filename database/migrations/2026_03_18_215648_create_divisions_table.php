@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->string('characteristics', 70);
             $table->foreignIdFor(Department::class)->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

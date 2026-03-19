@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('date');
             $table->string('attach', 255);
             $table->string('type')->default('public_reply');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

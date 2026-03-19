@@ -15,8 +15,9 @@ return new class extends Migration
         Schema::create('qualifications', function (Blueprint $table) {
             $table->id();
             $table->decimal('score', 4,2);
-            $table->text('comment'); 
+            $table->text('comment');
             $table->foreignIdFor(Ticket::class)->constrained();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
