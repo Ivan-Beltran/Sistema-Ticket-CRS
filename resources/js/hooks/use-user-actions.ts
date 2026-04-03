@@ -1,13 +1,27 @@
-import { User, UserFormData, RoleName } from '@/types';
+import type { RoleName } from '@/types/role';
+import type { UpdateUserFormData, User, UserFormData } from '@/types/user';
 import { router, useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 
+// ─── Tipos de retorno ────────────────────────────────────────────────────────
 
-export function useUserActions(user?: User) {
+interface UseUserActionsReturn {
+    form: ReturnType<typeof useForm<UserFormData>>;
+    store: (e: FormEvent, onSuccess?: () => void) => void;
+    update: (e: FormEvent, userId: number, onSuccess?: () => void) => void;
+    destroy: (userId: number, onSuccess?: () => void) => void;
+    isDeleting: boolean;
+}
+
+// ─── Hook ────────────────────────────────────────────────────────────────────
+
+export function useUserActions(user?: User | null): UseUserActionsReturn {
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const form = useForm<UserFormData>({
         name: user?.name ?? '',
         email: user?.email ?? '',
-        password: '',
+        password: '', // Vacío en edición = no cambia
         phone_number: user?.phone_number ?? '',
         ext: user?.ext ?? null,
         birthdate: user?.birthdate ?? '',
@@ -15,38 +29,68 @@ export function useUserActions(user?: User) {
         role: (user?.roles?.[0]?.name as RoleName) ?? '',
     });
 
-    const store = (e: FormEvent) => {
+    /**
+     * Crea un nuevo usuario (POST /users)
+     */
+    const store = (e: FormEvent, onSuccess?: () => void) => {
         e.preventDefault();
 
         form.post(route('users.store'), {
             preserveScroll: true,
-            onSuccess: () => form.reset('password'),
+            onSuccess: () => {
+                form.reset();
+                onSuccess?.();
+            },
         });
     };
 
-    const update = (e: FormEvent) => {
+    /**
+     * Actualiza un usuario existente (PATCH /users/:id)
+     * Si password viene vacío, el backend lo ignora.
+     */
+    const update = (e: FormEvent, userId: number, onSuccess?: () => void) => {
         e.preventDefault();
 
-        if (!user?.id) return;
-
-        form.put(route('users.update', user.id), {
+        form.patch(route('users.update', userId), {
             preserveScroll: true,
-            onSuccess: () => form.reset('password'),
+            onSuccess: () => {
+                form.reset();
+                onSuccess?.();
+            },
         });
     };
 
-    const destroy = (id: number) => {
-        if (!confirm('¿Eliminar usuario?')) return;
+    /**
+     * Elimina un usuario (DELETE /users/:id)
+     */
+    const destroy = (userId: number, onSuccess?: () => void) => {
+        setIsDeleting(true);
 
-        router.delete(route('users.destroy', id), {
+        router.delete(route('users.destroy', userId), {
             preserveScroll: true,
+            onSuccess: () => {
+                onSuccess?.();
+            },
+            onFinish: () => setIsDeleting(false),
         });
     };
 
+    return { form, store, update, destroy, isDeleting };
+}
+
+// ─── Helper: construir UpdateUserFormData desde un User ──────────────────────
+// Mapea un User del servidor al shape del formulario de edición.
+// password siempre inicia vacío — el usuario lo rellena solo si quiere cambiarlo.
+
+export function buildUpdateFormData(user: User): UpdateUserFormData {
     return {
-        form,
-        store,
-        update,
-        destroy,
+        name: user.name ?? '',
+        email: user.email ?? '',
+        password: '', // Intencional: vacío = sin cambio
+        phone_number: user.phone_number ?? '',
+        ext: user.ext ?? null,
+        birthdate: user.birthdate ?? '',
+        department_id: user.department_id ?? null,
+        role: (user.roles?.[0]?.name as RoleName) ?? '',
     };
 }

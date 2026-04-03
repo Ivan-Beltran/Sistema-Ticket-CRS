@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -40,6 +41,8 @@ class UserController extends Controller
             'name'          => 'required|string',
             'email'         => 'required|email|unique:users',
             'password'      => 'required|min:8',
+            'phone_number'  => 'required|digits:8',
+            'birthdate'     => 'required|date',
             'department_id' => 'required|exists:departments,id',
             'role'          => 'required|exists:roles,name',
         ]);
@@ -47,10 +50,10 @@ class UserController extends Controller
         $user = User::create([
             'name'          => $request->name,
             'email'         => $request->email,
-            'phone_number'  => $request->phone_number ?? '00000000',
+            'phone_number'  => $request->phone_number,
             'ext'           => $request->ext,
-            'birthdate'     => $request->birthdate ?? now(),
-            'password'      => $request->password,
+            'birthdate'     => $request->birthdate,
+            'password'      => $request->password, // Hashed via cast en el modelo
             'department_id' => $request->department_id,
             'is_active'     => true,
         ]);
@@ -83,9 +86,14 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name'  => 'required|string',
-            'email' => "required|email|unique:users,email,{$user->id}",
-            'role'  => 'required|exists:roles,name',
+            'name'          => 'required|string',
+            'email'         => "required|email|unique:users,email,{$user->id}",
+            'phone_number'  => 'required|digits:8',
+            'birthdate'     => 'required|date',
+            'department_id' => 'required|exists:departments,id',
+            'role'          => 'required|exists:roles,name',
+            // Password opcional: si viene, debe tener mínimo 8 caracteres
+            'password'      => 'nullable|min:8',
         ]);
 
         $user->update($request->only([
@@ -96,6 +104,13 @@ class UserController extends Controller
             'birthdate',
             'department_id',
         ]));
+
+        // Solo actualizar la contraseña si el usuario proporcionó una nueva
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
 
         $user->syncRoles($request->role);
 

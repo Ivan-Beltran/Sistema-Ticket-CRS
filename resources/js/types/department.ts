@@ -1,6 +1,9 @@
-export interface Department {
+export interface DepartmentBasic {
     id: number;
     name: string;
+}
+
+export interface Department extends DepartmentBasic {
     description: string | null;
     email_department: string | null;
     area_id: number | null;

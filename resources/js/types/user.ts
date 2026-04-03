@@ -1,17 +1,15 @@
-import { FormDataConvertible } from '@inertiajs/core';
-import { Department } from './department';
-import { Role, RoleName } from './role';
+import type { Department } from './department';
+import type { Role, RoleName } from './role';
 
 export interface User {
     id: number;
     name: string;
     email: string;
-    avatar?: string;
     email_verified_at: string | null;
     phone_number: string;
-    ext: string | null;
+    ext: number | null;
     birthdate: string;
-    is_active: number; // En el JSON viene como 1 o 0
+    is_active: boolean;
     department_id: number | null;
     deleted_at: string | null;
     created_at: string;
@@ -20,26 +18,39 @@ export interface User {
     department?: Department;
     roles?: Role[];
 
-    [key: string]: unknown; // Permite propiedades extra de Inertia
+    [key: string]: unknown;
 }
 
-// Tipo específico para el Formulario (useForm)
-export interface UserFormData {
+// ─── Base compartida (sin password) ─────────────────────────────────────────
+
+type BaseUserForm = {
     name: string;
     email: string;
-    password: string;
     phone_number: string;
-    ext: string | null;
+    ext: number | null;
     birthdate: string;
     department_id: number | null;
     role: RoleName | '';
+};
 
-    [key: string]: FormDataConvertible;
-}
+// ─── Formulario de creación (password obligatorio) ───────────────────────────
 
+export type UserFormData = BaseUserForm & {
+    password: string;
+};
+
+
+
+export type UpdateUserFormData = BaseUserForm & {
+    password: string;
+};
+
+// ─── Props del index ─────────────────────────────────────────────────────────
 
 export interface UserIndexProps {
     users: User[];
     departments: Department[];
-    roles: string[];
+    roles: RoleName[];
 }
+
+

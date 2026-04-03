@@ -1,10 +1,8 @@
-// resources/js/types/role.ts
-
 export type RoleName = 'admin' | 'agent' | 'user';
 
 export interface Role {
     id: number;
-    name: string;
+    name: RoleName;
     guard_name: string;
     created_at?: string;
     updated_at?: string;

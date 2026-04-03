@@ -5,19 +5,11 @@ import DeleteUserModal from '@/components/users/DeleteUserModal';
 import EditUserModal from '@/components/users/EditUserModal';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { type User } from '@/types/user';
-import { Department } from '@/types/department';
-import { RoleName } from '@/types/role';
-
-interface Props {
-    users: User[];
-    departments: Department[];
-    roles: RoleName[];
-}
+import type { UserIndexProps, User } from '@/types/user';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Usuarios', href: '/users' }];
 
-export default function Index({ users, departments, roles }: Props) {
+export default function Index({ users, departments, roles }: UserIndexProps) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -53,6 +45,7 @@ export default function Index({ users, departments, roles }: Props) {
                             Gestiona los miembros de tu equipo, sus roles y departamentos.
                         </p>
                     </div>
+
                     <button
                         onClick={() => setIsCreateOpen(true)}
                         className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
@@ -60,92 +53,103 @@ export default function Index({ users, departments, roles }: Props) {
                         Nuevo Usuario
                     </button>
                 </div>
+
                 <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-left">
                             <thead>
-                                <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    <th className="px-6 py-4">Usuario</th>
-                                    <th className="px-6 py-4">Contacto</th>
-                                    <th className="px-6 py-4">Departamento</th>
-                                    <th className="px-6 py-4">Rol</th>
-                                    <th className="px-6 py-4">Estado</th>
-                                    <th className="px-6 py-4 text-right">Acciones</th>
-                                </tr>
+                            <tr className="border-b border-gray-200 bg-gray-50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                <th className="px-6 py-4">Usuario</th>
+                                <th className="px-6 py-4">Contacto</th>
+                                <th className="px-6 py-4">Departamento</th>
+                                <th className="px-6 py-4">Rol</th>
+                                <th className="px-6 py-4">Estado</th>
+                                <th className="px-6 py-4 text-right">Acciones</th>
+                            </tr>
                             </thead>
+
                             <tbody className="divide-y divide-gray-200 text-sm">
-                                {users.map((user) => (
-                                    <tr key={user.id} className="transition-colors hover:bg-gray-50">
-                                        <td className="whitespace-nowrap px-6 py-4">
-                                            <div className="font-medium text-gray-900">{user.name}</div>
-                                            <div className="mt-0.5 text-xs text-gray-500">ID: {user.id}</div>
-                                        </td>
-                                        <td className="whitespace-nowrap px-6 py-4">
-                                            <div className="text-gray-900">{user.email}</div>
-                                            <div className="mt-0.5 text-xs text-gray-500">
-                                                Tel: {user.phone_number}
-                                            </div>
-                                        </td>
-                                        <td className="whitespace-nowrap px-6 py-4 text-gray-700">
-                                            {user.department?.name ?? 'Sin asignar'}
-                                        </td>
-                                        <td className="whitespace-nowrap px-6 py-4">
-                                            <div className="flex gap-1">
-                                                {user.roles?.map((role) => (
-                                                    <UserRoleBadge key={role.id} role={role} />
-                                                ))}
-                                            </div>
-                                        </td>
-                                        <td className="whitespace-nowrap px-6 py-4">
+                            {users.map((user) => (
+                                <tr key={user.id} className="transition-colors hover:bg-gray-50">
+                                    <td className="whitespace-nowrap px-6 py-4">
+                                        <div className="font-medium text-gray-900">{user.name}</div>
+                                        <div className="mt-0.5 text-xs text-gray-500">ID: {user.id}</div>
+                                    </td>
+
+                                    <td className="whitespace-nowrap px-6 py-4">
+                                        <div className="text-gray-900">{user.email}</div>
+                                        <div className="mt-0.5 text-xs text-gray-500">
+                                            Tel: {user.phone_number}
+                                        </div>
+                                    </td>
+
+                                    <td className="whitespace-nowrap px-6 py-4 text-gray-700">
+                                        {user.department?.name ?? 'Sin asignar'}
+                                    </td>
+
+                                    <td className="whitespace-nowrap px-6 py-4">
+                                        <div className="flex gap-1">
+                                            {user.roles?.map((role) => (
+                                                <UserRoleBadge key={role.id} role={role} />
+                                            ))}
+                                        </div>
+                                    </td>
+
+                                    <td className="whitespace-nowrap px-6 py-4">
                                             <span
                                                 className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${
-                                                    user.is_active === 1
+                                                    user.is_active
                                                         ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                                                         : 'border-red-200 bg-red-50 text-red-700'
                                                 }`}
                                             >
                                                 <span
                                                     className={`mr-1.5 h-1.5 w-1.5 rounded-full ${
-                                                        user.is_active === 1
+                                                        user.is_active
                                                             ? 'bg-emerald-500'
                                                             : 'bg-red-500'
                                                     }`}
                                                 />
-                                                {user.is_active === 1 ? 'Activo' : 'Inactivo'}
+                                                {user.is_active ? 'Activo' : 'Inactivo'}
                                             </span>
-                                        </td>
-                                        <td className="space-x-4 whitespace-nowrap px-6 py-4 text-right font-medium">
-                                            <button
-                                                onClick={() => openEditModal(user)}
-                                                className="text-blue-600 transition-colors hover:text-blue-900"
-                                            >
-                                                Editar
-                                            </button>
-                                            <button
-                                                onClick={() => openDeleteModal(user)}
-                                                className="text-red-600 transition-colors hover:text-red-900"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                    </td>
+
+                                    <td className="space-x-4 whitespace-nowrap px-6 py-4 text-right font-medium">
+                                        <button
+                                            onClick={() => openEditModal(user)}
+                                            className="text-blue-600 transition-colors hover:text-blue-900"
+                                        >
+                                            Editar
+                                        </button>
+
+                                        <button
+                                            onClick={() => openDeleteModal(user)}
+                                            className="text-red-600 transition-colors hover:text-red-900"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+
             <CreateUserModal
                 isOpen={isCreateOpen}
                 onClose={() => setIsCreateOpen(false)}
                 departments={departments}
                 roles={roles}
             />
+
             <DeleteUserModal
                 user={selectedUser}
                 isOpen={isDeleteOpen}
                 onClose={closeDeleteModal}
             />
+
             <EditUserModal
                 user={selectedUser}
                 isOpen={isEditOpen}
