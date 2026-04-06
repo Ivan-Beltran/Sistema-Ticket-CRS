@@ -1,10 +1,7 @@
 import Field from '@/components/ui/Field';
 import { buildUpdateFormData, useUserActions } from '@/hooks/use-user-actions';
-import type { RoleName } from '@/types/role';
-import type { UpdateUserFormData } from '@/types/user';
-import type { EditUserModalProps } from '@/types/user-modal';
 import { updateUserSchema } from '@/validations/user.schema';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
@@ -13,19 +10,19 @@ const inputClass =
 
 // ─── Componente ──────────────────────────────────────────────────────────────
 
-export default function EditUserModal({ user, isOpen, onClose, departments, roles }: EditUserModalProps) {
+export default function EditUserModal({ user, isOpen, onClose, departments, roles }) {
     const { form, update } = useUserActions(user);
     const { data, setData, processing, errors, reset, clearErrors } = form;
 
-    const [customErrors, setCustomErrors] = useState<Partial<Record<keyof UpdateUserFormData, string>>>({});
-    const [formError, setFormError] = useState<string | null>(null);
+    const [customErrors, setCustomErrors] = useState({});
+    const [formError, setFormError] = useState(null);
 
     // Cargar datos del usuario al abrir
     useEffect(() => {
         if (user && isOpen) {
             setData(buildUpdateFormData(user));
         }
-    }, [user, isOpen]);
+    }, [user, isOpen, setData]);
 
     // Limpiar estado al cerrar
     useEffect(() => {
@@ -39,7 +36,7 @@ export default function EditUserModal({ user, isOpen, onClose, departments, role
 
     if (!isOpen || !user) return null;
 
-    const validateForm = (): boolean => {
+    const validateForm = () => {
         const result = updateUserSchema.safeParse(data);
 
         if (result.success) {
@@ -47,9 +44,9 @@ export default function EditUserModal({ user, isOpen, onClose, departments, role
             return true;
         }
 
-        const fieldErrors: Partial<Record<keyof UpdateUserFormData, string>> = {};
+        const fieldErrors = {};
         result.error.issues.forEach((issue) => {
-            const field = issue.path[0] as keyof UpdateUserFormData;
+            const field = issue.path[0];
             if (!fieldErrors[field]) fieldErrors[field] = issue.message;
         });
 
@@ -57,7 +54,7 @@ export default function EditUserModal({ user, isOpen, onClose, departments, role
         return false;
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         clearErrors();
         setFormError(null);
@@ -107,17 +104,27 @@ export default function EditUserModal({ user, isOpen, onClose, departments, role
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <Field label="Nombre" error={customErrors.name ?? errors.name}>
-                            <input type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} className={inputClass} />
+                            <input 
+                                type="text" 
+                                value={data.name || ''} 
+                                onChange={(e) => setData('name', e.target.value)} 
+                                className={inputClass} 
+                            />
                         </Field>
 
                         <Field label="Correo electrónico" error={customErrors.email ?? errors.email}>
-                            <input type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} className={inputClass} />
+                            <input 
+                                type="email" 
+                                value={data.email || ''} 
+                                onChange={(e) => setData('email', e.target.value)} 
+                                className={inputClass} 
+                            />
                         </Field>
 
                         <Field label="Teléfono" error={customErrors.phone_number ?? errors.phone_number}>
                             <input
                                 type="text"
-                                value={data.phone_number}
+                                value={data.phone_number || ''}
                                 onChange={(e) => setData('phone_number', e.target.value)}
                                 className={inputClass}
                                 maxLength={8}
@@ -134,7 +141,12 @@ export default function EditUserModal({ user, isOpen, onClose, departments, role
                         </Field>
 
                         <Field label="Fecha de nacimiento" error={customErrors.birthdate ?? errors.birthdate}>
-                            <input type="date" value={data.birthdate} onChange={(e) => setData('birthdate', e.target.value)} className={inputClass} />
+                            <input 
+                                type="date" 
+                                value={data.birthdate || ''} 
+                                onChange={(e) => setData('birthdate', e.target.value)} 
+                                className={inputClass} 
+                            />
                         </Field>
 
                         <Field label="Departamento" error={customErrors.department_id ?? errors.department_id}>
@@ -153,7 +165,11 @@ export default function EditUserModal({ user, isOpen, onClose, departments, role
                         </Field>
 
                         <Field label="Rol" error={customErrors.role ?? errors.role}>
-                            <select value={data.role} onChange={(e) => setData('role', e.target.value as RoleName)} className={inputClass}>
+                            <select 
+                                value={data.role || ''} 
+                                onChange={(e) => setData('role', e.target.value)} 
+                                className={inputClass}
+                            >
                                 <option value="">Selecciona un rol</option>
                                 {roles.map((role) => (
                                     <option key={role} value={role}>
@@ -171,7 +187,7 @@ export default function EditUserModal({ user, isOpen, onClose, departments, role
                         >
                             <input
                                 type="password"
-                                value={data.password}
+                                value={data.password || ''}
                                 onChange={(e) => setData('password', e.target.value)}
                                 placeholder="••••••••"
                                 className={inputClass}

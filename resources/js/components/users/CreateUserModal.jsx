@@ -1,10 +1,7 @@
 import Field from '@/components/ui/Field';
 import { useUserActions } from '@/hooks/use-user-actions';
-import type { RoleName } from '@/types/role';
-import type { UserFormData } from '@/types/user';
-import type { UserModalBaseProps } from '@/types/user-modal';
 import { createUserSchema } from '@/validations/user.schema';
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
@@ -13,14 +10,14 @@ const inputClass =
 
 // ─── Componente ──────────────────────────────────────────────────────────────
 
-export default function CreateUserModal({ isOpen, onClose, departments, roles }: UserModalBaseProps) {
+export default function CreateUserModal({ isOpen, onClose, departments, roles }) {
     const { form, store } = useUserActions();
     const { data, setData, processing, errors, reset, clearErrors } = form;
 
-    const [formError, setFormError] = useState<string | null>(null);
-    const [customErrors, setCustomErrors] = useState<Partial<Record<keyof UserFormData, string>>>({});
+    const [formError, setFormError] = useState(null);
+    const [customErrors, setCustomErrors] = useState({});
 
-    const validateWithZod = (): boolean => {
+    const validateWithZod = () => {
         const result = createUserSchema.safeParse(data);
 
         if (result.success) {
@@ -29,9 +26,9 @@ export default function CreateUserModal({ isOpen, onClose, departments, roles }:
             return true;
         }
 
-        const fieldErrors: Partial<Record<keyof UserFormData, string>> = {};
+        const fieldErrors = {};
         result.error.issues.forEach((issue) => {
-            const field = issue.path[0] as keyof UserFormData;
+            const field = issue.path[0];
             if (!fieldErrors[field]) fieldErrors[field] = issue.message;
         });
 
@@ -40,7 +37,7 @@ export default function CreateUserModal({ isOpen, onClose, departments, roles }:
         return false;
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         clearErrors();
 
@@ -96,17 +93,27 @@ export default function CreateUserModal({ isOpen, onClose, departments, roles }:
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <Field label="Nombre" error={customErrors.name ?? errors.name}>
-                            <input type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} className={inputClass} />
+                            <input 
+                                type="text" 
+                                value={data.name || ''} 
+                                onChange={(e) => setData('name', e.target.value)} 
+                                className={inputClass} 
+                            />
                         </Field>
 
                         <Field label="Correo electrónico" error={customErrors.email ?? errors.email}>
-                            <input type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} className={inputClass} />
+                            <input 
+                                type="email" 
+                                value={data.email || ''} 
+                                onChange={(e) => setData('email', e.target.value)} 
+                                className={inputClass} 
+                            />
                         </Field>
 
                         <Field label="Contraseña" error={customErrors.password ?? errors.password}>
                             <input
                                 type="password"
-                                value={data.password}
+                                value={data.password || ''}
                                 onChange={(e) => setData('password', e.target.value)}
                                 className={inputClass}
                                 autoComplete="new-password"
@@ -116,7 +123,7 @@ export default function CreateUserModal({ isOpen, onClose, departments, roles }:
                         <Field label="Teléfono" error={customErrors.phone_number ?? errors.phone_number}>
                             <input
                                 type="text"
-                                value={data.phone_number}
+                                value={data.phone_number || ''}
                                 onChange={(e) => setData('phone_number', e.target.value)}
                                 className={inputClass}
                                 maxLength={8}
@@ -124,7 +131,12 @@ export default function CreateUserModal({ isOpen, onClose, departments, roles }:
                         </Field>
 
                         <Field label="Fecha de nacimiento" error={customErrors.birthdate ?? errors.birthdate}>
-                            <input type="date" value={data.birthdate} onChange={(e) => setData('birthdate', e.target.value)} className={inputClass} />
+                            <input 
+                                type="date" 
+                                value={data.birthdate || ''} 
+                                onChange={(e) => setData('birthdate', e.target.value)} 
+                                className={inputClass} 
+                            />
                         </Field>
 
                         <Field label="Extensión" optional>
@@ -152,7 +164,11 @@ export default function CreateUserModal({ isOpen, onClose, departments, roles }:
                         </Field>
 
                         <Field label="Rol" error={customErrors.role ?? errors.role}>
-                            <select value={data.role} onChange={(e) => setData('role', e.target.value as RoleName)} className={inputClass}>
+                            <select 
+                                value={data.role || ''} 
+                                onChange={(e) => setData('role', e.target.value)} 
+                                className={inputClass}
+                            >
                                 <option value="">Selecciona un rol</option>
                                 {roles.map((role) => (
                                     <option key={role} value={role}>
