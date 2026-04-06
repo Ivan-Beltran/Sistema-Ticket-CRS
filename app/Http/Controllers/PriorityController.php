@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Priority;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Http\Requests\StorePriorityRequest;
+use Illuminate\Http\RedirectResponse;
 
 class PriorityController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+    
     public function index()
     {
         return Inertia::render('priorities/index', [
@@ -23,15 +27,21 @@ class PriorityController extends Controller
      */
     public function create()
     {
-        //
+        $priorities = Priority::all();
+
+        return Inertia::render('priorities/create', [
+            'priorities' => $priorities
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePriorityRequest $request):RedirectResponse
     {
-        //
+        Priority::create($request->validated());
+
+        return redirect()->route('priorities.index')->with('success', 'Priority created successfully.');
     }
 
     /**
