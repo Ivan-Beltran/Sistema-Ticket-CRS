@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SlaPlan;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SlaPlanController extends Controller
 {
@@ -13,7 +14,9 @@ class SlaPlanController extends Controller
     public function index()
     {
         $planes = SlaPlan::all();
-        return view('sla_plans.index', compact('planes'));
+        return Inertia::render('sla-plans/index', [
+            'planes' => $planes,
+        ]);
     }
 
     /**
@@ -21,7 +24,7 @@ class SlaPlanController extends Controller
      */
     public function create()
     {
-        return view('sla_plans.create');
+        return Inertia::render('sla-plans/create');return view('sla_plans.create');
     }
 
     /**
