@@ -1,12 +1,16 @@
 import { useUserActions } from '@/hooks/use-user-actions';
-import type { DeleteUserModalProps } from '@/types/user-modal';
 
-export default function DeleteUserModal({ user, isOpen, onClose }: DeleteUserModalProps) {
+/**
+ * Modal de confirmación para eliminar un usuario.
+ */
+export default function DeleteUserModal({ user, isOpen, onClose }) {
     const { destroy, isDeleting } = useUserActions();
 
+    // Si el modal no está abierto o no hay usuario, no renderizamos nada
     if (!isOpen || !user) return null;
 
     const handleDelete = () => {
+        // Llamamos a destroy pasando el ID y un callback para cerrar el modal al terminar
         destroy(user.id, () => {
             onClose();
         });
