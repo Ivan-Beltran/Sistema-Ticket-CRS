@@ -29,6 +29,9 @@ class DatabaseSeeder extends Seeder
             'area_id' => $area->id,
         ]);
 
+        $this->call([
+            UserRoleSeeder::class,
+        ]);
 
         $user = User::factory()->create([
             'name' => 'Admin Admin',
@@ -43,6 +46,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $user->assignRole('admin');
+
 
 
     }

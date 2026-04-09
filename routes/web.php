@@ -18,9 +18,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Rutas de SLA Plans
-    Route::get('/sla-plans',        [SlaPlanController::class, 'index'])->name('sla-plans.index');
-    Route::get('/sla-plans/create', [SlaPlanController::class, 'create'])->name('sla-plans.create');
-    Route::post('/sla-plans',       [SlaPlanController::class, 'store'])->name('sla-plans.store');
+    Route::resource('/sla-plans',  SlaPlanController::class);
     Route::resource('priorities', PriorityController::class);
 
     Route::middleware(['role:admin'])->group(function () {
