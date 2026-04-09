@@ -7,6 +7,7 @@ import { BookOpen, Clock, Folder, LayoutGrid, ListChecks, Users } from 'lucide-r
 
 import AppLogo from './app-logo';
 
+
 const mainNavItems = [
     {
         title: 'Dashboard',
@@ -15,9 +16,20 @@ const mainNavItems = [
     },
 
     {
-        title: 'Prioridades',
-        url: '/priorities',
-        icon: ListChecks
+        title: 'Ticket',
+        icon: ListChecks,
+        children: [
+            {
+            title: 'Prioridades',
+            url: '/priorities',
+            icon: ListChecks
+            },
+            {
+                title: 'Planes SLA',
+                url: '/sla-plans',
+                icon: Clock,
+            },
+        ]
     },
 
     {
@@ -26,11 +38,7 @@ const mainNavItems = [
         icon: Users,
     },
 
-    {
-        title: 'Planes SLA',
-        url: '/sla-plans',
-        icon: Clock,
-    },
+
 ];
 
 const footerNavItems = [
