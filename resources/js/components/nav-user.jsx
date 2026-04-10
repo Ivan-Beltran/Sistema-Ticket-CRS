@@ -5,20 +5,14 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
-
-export const ROLE_TRANSLATIONS = {
-    superadmin: 'Super Administrador',
-    admin: 'Administrador de Área',
-    agent: 'Técnico',
-    user: 'Solicitante',
-};
+import { usePermissions } from '@/hooks/usePermissions';
 
 export function NavUser() {
     const { auth } = usePage().props;
     const { state } = useSidebar();
     const isMobile = useIsMobile();
-    const userRoleKey = auth.roles?.[0];
-    const displayRole = userRoleKey ? ROLE_TRANSLATIONS[userRoleKey] : 'Sin rol asignado';
+    const { getDisplayRole } = usePermissions();
+    const displayRole = getDisplayRole();
 
     return (
         <SidebarMenu>

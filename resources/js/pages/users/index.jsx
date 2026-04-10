@@ -1,24 +1,24 @@
-// resources/js/Pages/users/index.jsx
 /* global route */
 import DeleteEntityModal from '@/components/DeleteEntityModal';
 import { GenericTable } from '@/components/GenericTable';
 import { Button } from '@/components/ui/button';
 import UserRoleBadge from '@/components/users/UserRoleBadge';
+import UserTableActions from '@/components/users/UserTableActions';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
-import { Pencil, Plus, Trash2, User } from 'lucide-react';
+import { Plus, User } from 'lucide-react';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
-import { usePermissions } from '@/hooks/usePermissions';
+
 
 export default function Users({ users = [], departments = [], roles = [] }) {
     const [selectedUser, setSelectedUser] = useState(null);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-    // 🚀 Inicializamos el hook
     const { hasPermission, authUser } = usePermissions();
 
-    const columns = [
+    const allColumns = [
         {
             header: 'Usuario',
             render: (user) => (
@@ -77,33 +77,25 @@ export default function Users({ users = [], departments = [], roles = [] }) {
             header: 'Acciones',
             className: 'text-right',
             render: (user) => (
-                <div className="flex justify-end gap-2">
-                    {hasPermission('manage_users') && (
-                        <>
-                            <Button variant="ghost" size="icon" asChild className="h-8 w-8 hover:text-blue-600">
-                                <Link href={route('users.edit', user.id)}>
-                                    <Pencil className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            {user.id !== 1 && user.id !== authUser?.id && (
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 hover:text-red-600"
-                                    onClick={() => {
-                                        setSelectedUser(user);
-                                        setIsDeleteOpen(true);
-                                    }}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            )}
-                        </>
-                    )}
-                </div>
+                <UserTableActions
+                    user={user}
+                    authUser={authUser}
+                    onDelete={(u) => {
+                        setSelectedUser(u);
+                        setIsDeleteOpen(true);
+                    }}
+                />
             ),
         },
     ];
+
+    // Filtrar la columna de acciones si el usuario no tiene permisos
+    const columns = allColumns.filter((column) => {
+        if (column.header === 'Acciones') {
+            return hasPermission('manage_users');
+        }
+        return true;
+    });
 
     return (
         <AppLayout>
@@ -117,7 +109,6 @@ export default function Users({ users = [], departments = [], roles = [] }) {
                         <p className="text-sm text-zinc-500">Gestión de miembros del equipo, roles y departamentos.</p>
                     </div>
 
-                    {/* 🛡️ PROTECCIÓN 3: Botón Nuevo solo para usuarios autorizados */}
                     {hasPermission('manage_users') && (
                         <Button asChild className="bg-zinc-900 dark:bg-zinc-50 dark:text-zinc-900">
                             <Link href={route('users.create')}>

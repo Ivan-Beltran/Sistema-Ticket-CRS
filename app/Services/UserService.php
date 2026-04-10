@@ -30,7 +30,6 @@ class UserService
                 ->get();
         }
 
-        // 3. Otros roles no ven nada o ven lista vacía
         return collect();
     }
 
@@ -83,7 +82,6 @@ class UserService
      */
     public function deleteUser(User $user): void
     {
-        // 🛑 Bloqueo de seguridad: No permitir borrar al SuperAdmin raíz o al usuario actual
         if ($user->id === 1 || $user->id === auth()->id()) {
             throw new \Exception("No se puede eliminar este usuario por razones de seguridad.");
         }

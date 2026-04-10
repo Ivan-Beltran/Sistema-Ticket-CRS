@@ -6,6 +6,7 @@ import { useUserActions } from '@/hooks/use-user-actions';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import { translateRoleName } from '@/hooks/usePermissions';
 
 export default function Edit({ user, departments = [], roles = [] }) {
     const { form, update } = useUserActions(user);
@@ -154,7 +155,7 @@ export default function Edit({ user, departments = [], roles = [] }) {
                                     <option value="">Selecciona un rol</option>
                                     {roles.map((role) => (
                                         <option key={role} value={role}>
-                                            {role}
+                                            {translateRoleName(role)}
                                         </option>
                                     ))}
                                 </select>

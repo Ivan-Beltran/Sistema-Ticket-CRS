@@ -55,15 +55,3 @@ export function useUserActions(user = null) {
     return { form, store, update, destroy, isDeleting };
 }
 
-export function buildUpdateFormData(user) {
-    return {
-        name: user.name ?? '',
-        email: user.email ?? '',
-        password: '',
-        phone_number: user.phone_number ?? '',
-        ext: user.ext ?? '',
-        birthdate: user.birthdate ?? '',
-        department_id: user.department_id ?? '',
-        role: user.roles?.[0]?.name ?? '',
-    };
-}
