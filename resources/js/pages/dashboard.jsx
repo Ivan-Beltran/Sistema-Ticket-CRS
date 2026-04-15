@@ -1,7 +1,7 @@
 import { Head, usePage } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 
-import AdminDashboard from '../pages/dashboards/admin-dashboard';
+import SuperAdminDashboard from '../pages/dashboards/super-admin-dashboard';
 import AgentDashboard from '../pages/dashboards/agent-dashboard';
 
 const breadcrumbs = [
@@ -16,11 +16,11 @@ export default function Dashboard() {
     const userRoles = auth?.user?.roles || [];
 
     // Verificamos si el usuario tiene el rol 'admin' (Ajusta el nombre si en tu BD se llama 'Administrador')
-    const isAdmin = userRoles.includes('admin');
+    const isAdmin = userRoles.includes('superadmin');
 
     const renderContent = () => {
         if (isAdmin) {
-            return <AdminDashboard />;
+            return <SuperAdminDashboard />;
         }
 
         // Si no es admin, mostramos el dashboard del agente

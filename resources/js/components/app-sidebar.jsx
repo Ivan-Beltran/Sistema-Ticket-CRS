@@ -2,10 +2,11 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, ListChecks, Users } from 'lucide-react';
+import { usePage, Link } from '@inertiajs/react';
+import { BookOpen, Clock, Folder, LayoutGrid, ListChecks, Users } from 'lucide-react';
 
 import AppLogo from './app-logo';
+
 
 const mainNavItems = [
     {
@@ -15,20 +16,52 @@ const mainNavItems = [
     },
 
     {
-        title: 'Prioridades',
-        url: '/priorities',
-        icon: ListChecks
+        title: 'Ticket',
+        icon: ListChecks,
+        children: [
+            {
+                title: 'Prioridades',
+                url: '/priorities',
+                icon: ListChecks,
+                permission: 'ver prioridades'
+            },
+            {
+                title: 'Planes SLA',
+                url: '/sla-plans',
+                icon: Clock,
+                permission: 'ver sla plans'
+            },
+        ]
     },
 
     {
         title: 'Usuarios',
         url: '/users',
         icon: Users,
+        permission: 'ver usuarios'
     },
+
+
 ];
 
 
+function filterNavItems(items, hasPermission) {
+    return items
+        .filter(item => !item.permission || hasPermission(item.permission))
+        .map(item =>
+            item.children
+                ? { ...item, children: filterNavItems(item.children, hasPermission) }
+                : item
+        )
+        .filter(item => !item.children || item.children.length > 0);
+}
+
 export function AppSidebar() {
+    const { auth } = usePage().props;
+    const userPermissions = auth?.user?.permissions || [];
+    const hasPermission = (perm) => userPermissions.includes(perm);
+    const filteredNavItems = filterNavItems(mainNavItems, hasPermission);
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -44,7 +77,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={filteredNavItems}  />
             </SidebarContent>
 
         </Sidebar>

@@ -10,9 +10,9 @@ class UserRoleSeeder extends Seeder
     public function run(): void
     {
         $user = User::where('email', 'admin@admin.com')->first();
-
         if ($user) {
             $user->syncRoles(['superadmin']);
         }
+
     }
 }

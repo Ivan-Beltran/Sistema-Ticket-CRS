@@ -53,11 +53,9 @@ class HandleInertiaRequests extends Middleware
                     )
                     :null,
             ],
-
-            // Mensajes globales de sesión (para el Toaster / Alertas)
             'flash' => [
-                'success' => $request->session()->get('success'),
-                'error' => $request->session()->get('error'),
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
         ];
     }
