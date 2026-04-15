@@ -27,6 +27,9 @@ class UserRoleSeeder extends Seeder
             'eliminar plan_sla',
             'ver dashboard',
             'gestionar usuarios',
+            'ver prioridades',
+            'ver sla plans',
+            'ver usuarios'
 
         ];
 

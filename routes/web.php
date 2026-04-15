@@ -15,9 +15,9 @@ Route::middleware(['auth'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-
     // Rutas de SLA Plans
     Route::resource('/sla-plans',  SlaPlanController::class);
+    // Rutas de prioridades
     Route::resource('priorities', PriorityController::class);
 
     Route::middleware(['role:admin'])->group(function () {
