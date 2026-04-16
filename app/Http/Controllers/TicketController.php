@@ -61,12 +61,23 @@ class TicketController extends Controller
         'subject'        => 'required|string|max:200',
         'message'        => 'required|string',
         'attach'         => 'nullable|file|max:5120', // 5 MB
+    ], [
+    'department_id.required' => 'El departamento es obligatorio.',
+    'division_id.required'   => 'La división es obligatoria.',
+    'help_topic_id.required' => 'El tema de ayuda es obligatorio.',
+    'subject.required'       => 'El asunto es obligatorio.',
+    'subject.max'            => 'El asunto no puede superar los 200 caracteres.',
+    'message.required'       => 'El mensaje es obligatorio.',
+    'attach.file'            => 'El adjunto debe ser un archivo válido.',
+    'attach.max'             => 'El adjunto no puede superar los 5 MB.',
     ]);
-
     // Obtener el tema de ayuda y sus relaciones
-    $helpTopic = HelpTopic::with('priority.slaPlan')->findOrFail($validated['help_topic_id']);
-    $priority = $helpTopic->priority;
-    $slaPlan = $priority->slaPlan;
+    // $helpTopic = HelpTopic::with('priority.slaPlan')->findOrFail($validated['help_topic_id']);
+    // $priority = $helpTopic->priority;
+    // $slaPlan = $priority->slaPlan;
+    $helpTopic = HelpTopic::with(['priority', 'slaPlan'])->findOrFail($validated['help_topic_id']);
+    $priority  = $helpTopic->priority;
+    $slaPlan   = $helpTopic->slaPlan;
 
     $statusOpen = Status::where('name', 'open')->firstOrFail();
 
@@ -74,7 +85,7 @@ class TicketController extends Controller
     $code = $this->generateTicketCode();
 
     $creationDate = Carbon::now();
-    $expirationDate = $creationDate->copy()->addHours($slaPlan->response_time_hours);
+    $expirationDate = $creationDate->copy()->addHours($slaPlan->grace_time_hours);
 
     // Manejar archivo adjunto
     $attachPath = null;
