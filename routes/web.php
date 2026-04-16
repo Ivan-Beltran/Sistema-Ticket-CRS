@@ -47,6 +47,8 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Rutas de SLA Plans
+    Route::get('/sla-plans/trashed', [SlaPlanController::class, 'trashed'])->name('sla-plans.trashed');
+    Route::put('/sla-plans/{id}/restore', [SlaPlanController::class, 'restore'])->name('sla-plans.restore');
     Route::resource('/sla-plans',  SlaPlanController::class);
     // Rutas de prioridades
     Route::resource('priorities', PriorityController::class);
