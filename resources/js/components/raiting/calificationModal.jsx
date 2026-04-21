@@ -2,7 +2,8 @@ import { useState } from "react";
 
 export default function TicketRatingModal({ isOpen, onClose }) {
 
-  const [rating, setRating] = useState(2);
+  const [rating, setRating] = useState(0);
+  const [comentario, setComentario] = useState("")
 
   if (!isOpen) {
     return null;
@@ -57,15 +58,14 @@ export default function TicketRatingModal({ isOpen, onClose }) {
             {/* Estrellas */}
             <div className="flex items-center gap-1 text-2xl mb-3">
 
-              {[1,2,3,4,5].map((star) => (
+              {[1, 2, 3, 4, 5].map((star) => (
                 <span
                   key={star}
                   onClick={() => setRating(star)}
-                  className={`cursor-pointer transition ${
-                    star <= rating
-                      ? "text-yellow-400 scale-110"
-                      : "text-gray-300 hover:text-yellow-300"
-                  }`}
+                  className={`cursor-pointer transition ${star <= rating
+                    ? "text-yellow-400 scale-110"
+                    : "text-gray-300 hover:text-yellow-300"
+                    }`}
                 >
                   ★
                 </span>
@@ -78,32 +78,43 @@ export default function TicketRatingModal({ isOpen, onClose }) {
             </div>
 
             {/* Comentario */}
-            <h3 className="text-red-700 font-semibold text-sm">
+            <h3
+              className={`font-semibold text-sm ${rating > 3 ? "text-green-700" : "text-red-700"
+                }`}
+            >
               Comentario
             </h3>
 
-            <p className="text-xs text-orange-600 mb-2">
+            <p
+              className={`text-xs mb-2 ${rating > 3 ? "text-green-600" : "text-orange-600"
+                }`}
+            >
               Explica tu calificación para ayudarnos a mejorar
             </p>
 
             <textarea
-              className="w-full border rounded-md p-2 h-24 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-400"
+              value={comentario}
+              onChange={(e) => setComentario(e.target.value)}
+              className={`w-full border rounded-md p-2 h-24 text-sm resize-none focus:outline-none focus:ring-2 ${rating > 3 ? "focus:ring-green-400" : "focus:ring-red-400"
+                }`}
               placeholder="Escribe tu comentario..."
             />
 
           </div>
 
           {/* Botones */}
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-center gap-2">
+
+
 
             <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm rounded-md border hover:bg-gray-100"
+              disabled={rating === 0 || comentario.trim() === ""}
+              className={`px-4 py-2 text-sm rounded-md w-40 text-white 
+                ${rating === 0 || comentario.trim() === ""
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-red-500 hover:bg-red-600"
+                }`}
             >
-              Cancelar
-            </button>
-
-            <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 text-sm rounded-md">
               Enviar
             </button>
 

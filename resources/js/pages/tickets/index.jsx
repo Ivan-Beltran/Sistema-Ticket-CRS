@@ -248,7 +248,10 @@ export default function Index() {
                     </div>
                 </div>
             )}
-
+            
+        <TicketRatingModal
+            isOpen={true}
+        />
         </AppLayout>
         
     );
