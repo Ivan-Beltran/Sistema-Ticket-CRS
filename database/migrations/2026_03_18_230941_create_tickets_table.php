@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('email', 100);
             $table->string('subject', 200);
             $table->text('message');
-            $table->string('attach', 255)->nullable();
             $table->date('expiration_date')->nullable();
             $table->date('closing_date')->nullable();
             $table->foreignIdFor(User::class, 'requesting_user')->constrained();

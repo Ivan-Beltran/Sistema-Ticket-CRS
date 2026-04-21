@@ -14,17 +14,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class TicketController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    // app/Http/Controllers/TicketController.php
+
     public function index()
     {
-        $tickets = Ticket::with('status')
-            ->where('requesting_user', Auth::id())
-            ->get();
+        $tickets = Ticket::with(['department', 'assignedUser', 'status'])
+                        ->orderBy('created_at', 'desc')
+                        ->get();
 
         return Inertia::render('tickets/index', [
             'tickets' => $tickets,
@@ -50,50 +56,76 @@ class TicketController extends Controller
     /**
      * Guarda el ticket en la base de datos.
      */
+    // En tu controlador (TicketController)
+
+
     public function store(StoreTicketRequest $request)
     {
         $validated = $request->validated();
 
-        // Obtener el tema de ayuda y sus relaciones
-        // $helpTopic = HelpTopic::with('priority.slaPlan')->findOrFail($validated['help_topic_id']);
-        // $priority = $helpTopic->priority;
-        // $slaPlan = $priority->slaPlan;
-        $helpTopic = HelpTopic::with(['priority', 'slaPlan'])->findOrFail($validated['help_topic_id']);
-        $priority  = $helpTopic->priority;
-        // $slaPlan   = $helpTopic->slaPlan;
+        DB::beginTransaction();
 
-        $statusOpen = Status::where('name', 'Abierto')->firstOrFail();
+        try {
+            $helpTopic = HelpTopic::with(['priority', 'slaPlan'])->findOrFail($validated['help_topic_id']);
+            $priority  = $helpTopic->priority;
+            $statusOpen = Status::where('name', 'Abierto')->firstOrFail();
 
-        // Generar código único
-        $code = $this->generateTicketCode();
+            $code = $this->generateTicketCode();
+            $creationDate = Carbon::now();
 
-        $creationDate = Carbon::now();
-        // $expirationDate = $creationDate->copy()->addHours($slaPlan->grace_time_hours);
+            // Crear el ticket
+            $ticket = Ticket::create([
+                'code'            => $code,
+                'creation_date'   => $creationDate,
+                'email'           => Auth::user()->email,
+                'subject'         => $validated['subject'],
+                'message'         => $validated['message'],
+                'expiration_date' => null,
+                'closing_date'    => null,
+                'requesting_user' => Auth::id(),
+                'assigned_user'   => null,
+                'help_topic_id'   => $helpTopic->id,
+                'priority_id'     => $priority->id,
+                'sla_plan_id'     => null,
+                'department_id'   => $validated['department_id'],
+                'status_id'       => $statusOpen->id,
+            ]);
 
-        // Manejar archivo adjunto
-        $attachPath = null;
-        if ($request->hasFile('attach')) {
-            $attachPath = $request->file('attach')->store('tickets', 'public');
+            // Procesar múltiples archivos
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    $originalName = $file->getClientOriginalName();
+                    $extension    = $file->getClientOriginalExtension();
+                    $newFileName  = Str::random(40) . '.' . $extension;
+
+                    $path = $file->storeAs(
+                        "tickets/{$ticket->id}",
+                        $newFileName,
+                        'public'
+                    );
+
+                    $ticket->attachments()->create([
+                        'file_name' => $originalName,
+                        'file_path' => $path,
+                        'file_type' => $file->getMimeType(),
+                        'file_size' => $file->getSize(),
+                    ]);
+                }
+            }
+
+            // Disparar evento
+            event(new \App\Events\TicketCreated($ticket));
+
+            DB::commit();
+
+            return redirect()->route('tickets.index')->with('success', 'Ticket creado correctamente');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al crear ticket: ' . $e->getMessage());
+
+            return redirect()->back()->withInput()->with('error', 'Ocurrió un error al crear el ticket. Por favor, inténtelo de nuevo.');
         }
-
-        $ticket = Ticket::create([
-            'code'            => $code,
-            'creation_date'   => $creationDate,
-            'email'           => Auth::User()->email,
-            'subject'         => $validated['subject'],
-            'message'         => $validated['message'],
-            'attach'          => $attachPath,
-            'expiration_date' => null,
-            'closing_date'    => null,
-            'requesting_user' => Auth::id(),
-            'assigned_user'   => null,
-            'help_topic_id'   => $helpTopic->id,
-            'priority_id'     => $priority->id,
-            'sla_plan_id'     => null,
-            'department_id'   => $validated['department_id'],
-            'status_id'       => $statusOpen->id,
-        ]);
-        return redirect()->route('tickets.index')->with('success', 'Ticket creado correctamente');
     }
 
     private function generateTicketCode()
