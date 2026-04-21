@@ -7,7 +7,7 @@ use Database\Seeders\AreaSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\UserSeeder;
-use Database\Seeders\MigrateRolesSeeder;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,13 +16,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AreaSeeder::class,
             DepartmentSeeder::class,
+            CategorySeeder::class,
+            KnowledgeSeeder::class,
             RoleSeeder::class,
             UserSeeder::class,
             UserRoleSeeder::class,
             TecnicoDataSeeder::class,
-            CategorySeeder::class,
-            KnowledgeSeeder::class,
-            MigrateRolesSeeder::class,
         ]);
 
     }

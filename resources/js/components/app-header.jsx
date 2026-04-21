@@ -10,9 +10,10 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, Users } from 'lucide-react';
 
 import { CruzRojaLogo } from '../components/CruzRojaLogo';
+import { usePermissions } from '@/hooks/usePermissions';
 
 const mainNavItems = [
     {
@@ -25,11 +26,28 @@ const mainNavItems = [
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
-// Eliminada la interface AppHeaderProps y el tipado de la función
 export function AppHeader({ breadcrumbs = [] }) {
-    const page = usePage(); // Eliminado el genérico <SharedData>
+    const page = usePage();
     const { auth } = page.props;
     const getInitials = useInitials();
+
+    // 3. Obtenemos la función para validar roles por nombre
+    const { hasRole } = usePermissions();
+
+    // 4. Creamos la lista de navegación dinámica
+    const allNavItems = [
+        ...mainNavItems,
+        // Solo agregamos "Usuarios" si el nombre del rol es 'superadmin'
+        ...(hasRole('superadmin')
+            ? [
+                  {
+                      title: 'Usuarios',
+                      url: '/users',
+                      icon: Users,
+                  },
+              ]
+            : []),
+    ];
 
     return (
         <>
@@ -43,23 +61,21 @@ export function AppHeader({ breadcrumbs = [] }) {
                                     <Menu className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="flex h-full w-64 flex-col items-stretch justify-between bg-sidebar">
+                            <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
-                                    <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
+                                    <CruzRojaLogo size="xs" />
                                 </SheetHeader>
                                 <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
-                                            {mainNavItems.map((item) => (
+                                            {allNavItems.map((item) => (
                                                 <Link key={item.title} href={item.url} className="flex items-center space-x-2 font-medium">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
                                                 </Link>
                                             ))}
                                         </div>
-
-
                                     </div>
                                 </div>
                             </SheetContent>
@@ -67,14 +83,14 @@ export function AppHeader({ breadcrumbs = [] }) {
                     </div>
 
                     <Link href="/dashboard" prefetch className="flex items-center space-x-2">
-                        <CruzRojaLogo size='xs'/>
+                        <CruzRojaLogo size="xs" />
                     </Link>
 
                     {/* Desktop Navigation */}
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
+                                {allNavItems.map((item, index) => (
                                     <NavigationMenuItem key={index} className="relative flex h-full items-center">
                                         <Link
                                             href={item.url}
@@ -101,7 +117,6 @@ export function AppHeader({ breadcrumbs = [] }) {
                             <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
-
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

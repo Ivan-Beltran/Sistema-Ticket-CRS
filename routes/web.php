@@ -52,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('priorities', PriorityController::class);
     Route::resource('tickets', TicketController::class);
 
-    Route::middleware(['permission:manage_users|view_area_dashboard'])->group(function () {
+    Route::middleware(['role:superadmin'])->group(function () {
         Route::resource('users', UserController::class);
     });
 

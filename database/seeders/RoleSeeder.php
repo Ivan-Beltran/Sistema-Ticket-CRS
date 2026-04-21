@@ -41,7 +41,6 @@ class RoleSeeder extends Seeder
 
 
         $superAdminRole->syncPermissions(Permission::all());
-        $agentRole->syncPermissions(Permission::all());
 
         $adminRole->syncPermissions([
             'manage_area_tickets', 'assign_tickets', 'view_area_dashboard',
