@@ -7,6 +7,7 @@ use Database\Seeders\AreaSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\UserSeeder;
+use Database\Seeders\MigrateRolesSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,6 +22,7 @@ class DatabaseSeeder extends Seeder
             TecnicoDataSeeder::class,
             CategorySeeder::class,
             KnowledgeSeeder::class,
+            MigrateRolesSeeder::class,
         ]);
 
     }

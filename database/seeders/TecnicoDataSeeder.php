@@ -24,7 +24,7 @@ class TecnicoDataSeeder extends Seeder
     public function run(): void
     {
         //Estos datos son meramente de testingg
-        Role::firstOrCreate(['name' => 'tecnico']);
+        Role::firstOrCreate(['name' => 'agent']);
 
         // Crear areas
         $areaSoporte = Area::firstOrCreate([
@@ -65,7 +65,7 @@ class TecnicoDataSeeder extends Seeder
             'department_id' => $deptSoporte->id,
             'email_verified_at' => now(),
         ]);
-        $tecnico1->assignRole('tecnico');
+        $tecnico1->assignRole('agent');
 
         $tecnico2 = User::firstOrCreate([
             'email' => 'tecnico2@empresa.com'
@@ -79,7 +79,7 @@ class TecnicoDataSeeder extends Seeder
             'department_id' => $deptSistemas->id,
             'email_verified_at' => now(),
         ]);
-        $tecnico2->assignRole('tecnico');
+        $tecnico2->assignRole('agent');
 
         // Crear usuarios solicitantes
         $usuario1 = User::firstOrCreate([
@@ -329,9 +329,9 @@ class TecnicoDataSeeder extends Seeder
             Ticket::firstOrCreate(['code' => $ticketData['code']], $ticketData);
         }
 
-        $this->command->info('Datos de ejemplo para técnico creados exitosamente!');
-        $this->command->info('Usuario técnico: tecnico1@empresa.com / contraseña: 123456');
-        $this->command->info('Usuario técnico 2: tecnico2@empresa.com / contraseña: 123456');
+        $this->command->info('Datos de ejemplo para agent creados exitosamente!');
+        $this->command->info('Usuario agent: tecnico1@empresa.com / contraseña: 123456');
+        $this->command->info('Usuario agent 2: tecnico2@empresa.com / contraseña: 123456');
         $this->command->info('Usuarios solicitantes: juan.perez@empresa.com, ana.martinez@empresa.com / contraseña: 123456');
     }
 }

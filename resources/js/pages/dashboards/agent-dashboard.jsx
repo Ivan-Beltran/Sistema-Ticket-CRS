@@ -35,13 +35,13 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('/tecnico/dashboard-data');
+                const response = await axios.get('/agent/dashboard-data');
 
                 setTicketsAsignados(response.data.tickets_asignados || []);
                 setHistorialFinalizados(response.data.historial_finalizados || []);
                 setEstadisticas(response.data.estadisticas || null);
             } catch (error) {
-                console.error('Error fetching dashboard data:', error);
+                console.error('Error al obtener datos del dashboard:', error);
             }
         };
 
@@ -106,7 +106,7 @@ export default function Dashboard() {
                 formData.append('adjuntos[]', file);
             });
 
-            await axios.post(`/tecnico/ticket/${selectedTicketId}/diagnostico`, formData, {
+            await axios.post(`/agent/ticket/${selectedTicketId}/diagnostico`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             setDiagnosticStatus({ type: 'success', msg: 'Diagnóstico guardado exitosamente.' });
@@ -118,21 +118,21 @@ export default function Dashboard() {
             setSelectedTicketId(null);
             setShowDiagnosticPanel(false);
 
-            const response = await axios.get('/tecnico/dashboard-data');
+            const response = await axios.get('/agent/dashboard-data');
             setTicketsAsignados(response.data.tickets_asignados || []);
             setHistorialFinalizados(response.data.historial_finalizados || []);
             setEstadisticas(response.data.estadisticas || null);
 
             setTimeout(() => setDiagnosticStatus(null), 3000);
         } catch (error) {
-            console.error('Error saving diagnostic:', error);
+            console.error('Error al guardar diagnóstico:', error);
             setDiagnosticStatus({ type: 'error', msg: 'Ocurrió un error al guardar el diagnóstico.' });
         }
     };
 
     return (
         <div>
-            <Head title="Dashboard Técnico" />
+            <Head title="Panel de Agente" />
 
 
             <div className="p-4 md:p-6 lg:p-8 w-full flex flex-col h-full  mx-auto  sm:p-6 space-y-6 text-gray-800 font-sans">
@@ -321,35 +321,35 @@ export default function Dashboard() {
                                                 const status = row.estado || row.status?.name || 'N/A';
                                                 const statusLower = status.toLowerCase();
 
-                                                if (statusLower === 'abierto' || statusLower === 'open' || statusLower === 'nuevo') {
+                                                if (statusLower === 'abierto' || statusLower === 'nuevo') {
                                                     return (
                                                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200">
                                                             <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
                                                             {status}
                                                         </span>
                                                     );
-                                                } else if (statusLower === 'en proceso' || statusLower === 'proceso' || statusLower === 'progreso' || statusLower === 'in progress') {
+                                                } else if (statusLower === 'en proceso' || statusLower === 'proceso' || statusLower === 'progreso' || statusLower === 'en progreso') {
                                                     return (
                                                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
                                                             <span className="w-2 h-2 bg-blue-500 rounded-full mr-1.5"></span>
                                                             {status}
                                                         </span>
                                                     );
-                                                } else if (statusLower === 'cerrado' || statusLower === 'resuelto' || statusLower === 'finalizado' || statusLower === 'closed' || statusLower === 'resolved') {
+                                                } else if (statusLower === 'cerrado' || statusLower === 'resuelto' || statusLower === 'finalizado') {
                                                     return (
                                                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200">
                                                             <span className="w-2 h-2 bg-gray-500 rounded-full mr-1.5"></span>
                                                             {status}
                                                         </span>
                                                     );
-                                                } else if (statusLower === 'pendiente' || statusLower === 'esperando' || statusLower === 'pending') {
+                                                } else if (statusLower === 'pendiente' || statusLower === 'esperando') {
                                                     return (
                                                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">
                                                             <span className="w-2 h-2 bg-orange-500 rounded-full mr-1.5 animate-pulse"></span>
                                                             {status}
                                                         </span>
                                                     );
-                                                } else if (statusLower === 'cancelado' || statusLower === 'cancelled') {
+                                                } else if (statusLower === 'cancelado') {
                                                     return (
                                                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
                                                             <span className="w-2 h-2 bg-red-500 rounded-full mr-1.5"></span>
@@ -371,21 +371,21 @@ export default function Dashboard() {
                                                 const priority = row.prioridad || row.priority?.name || 'N/A';
                                                 const priorityLower = priority.toLowerCase();
 
-                                                if (priorityLower === 'alta' || priorityLower === 'high') {
+                                                if (priorityLower === 'alta') {
                                                     return (
                                                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
                                                             <span className="w-2 h-2 bg-red-500 rounded-full mr-1.5 animate-pulse"></span>
                                                             {priority}
                                                         </span>
                                                     );
-                                                } else if (priorityLower === 'media' || priorityLower === 'medium' || priorityLower === 'normal') {
+                                                } else if (priorityLower === 'media' || priorityLower === 'normal') {
                                                     return (
                                                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
                                                             <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1.5"></span>
                                                             {priority}
                                                         </span>
                                                     );
-                                                } else if (priorityLower === 'baja' || priorityLower === 'low') {
+                                                } else if (priorityLower === 'baja') {
                                                     return (
                                                         <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
                                                             <span className="w-2 h-2 bg-blue-500 rounded-full mr-1.5"></span>
@@ -407,7 +407,7 @@ export default function Dashboard() {
                                         </td>
                                         <td className="px-4 py-4 flex flex-col gap-1.5 min-w-[140px] items-center">
                                             <Link
-                                                href={`/tecnico/ticket/${row.id}`}
+                                                href={`/agent/ticket/${row.id}`}
                                                 className="bg-blue-500 hover:bg-blue-600 text-white text-[10px] w-full max-w-[120px] font-bold py-1.5 px-3 rounded shadow-sm transition-colors text-center"
                                             >
                                                 Ver Detalles
@@ -415,8 +415,7 @@ export default function Dashboard() {
                                             {(() => {
                                                 const status = row.estado || row.status?.name || '';
                                                 const statusLower = status.toLowerCase();
-                                                const isClosedOrResolved = statusLower === 'cerrado' || statusLower === 'resuelto' || statusLower === 'finalizado' ||
-                                                                         statusLower === 'closed' || statusLower === 'resolved' || statusLower === 'completed';
+                                                const isClosedOrResolved = statusLower === 'cerrado' || statusLower === 'resuelto' || statusLower === 'finalizado';
 
                                                 if (!isClosedOrResolved) {
                                                     return (

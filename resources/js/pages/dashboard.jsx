@@ -21,7 +21,7 @@ export default function Dashboard() {
     // Le damos prioridad de arriba hacia abajo
     const getPrimaryRole = () => {
         if (userRoles.includes('superadmin')) return 'superadmin';
-        if (userRoles.includes('tecnico')) return 'tecnico';
+        if (userRoles.includes('agent')) return 'agent';
         if (userRoles.includes('user')) return 'user';
 
         return 'default'; // Si no tiene ningún rol asignado
@@ -35,7 +35,7 @@ export default function Dashboard() {
             case 'superadmin':
                 return <SuperAdminDashboard />;
 
-            case 'tecnico':
+            case 'agent':
                 return <AgentDashboard />;
 
             case 'user':

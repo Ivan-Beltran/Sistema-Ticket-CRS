@@ -17,15 +17,15 @@ Route::middleware(['auth'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-     Route::middleware(['role:tecnico|admin'])->group(function () {
-        Route::prefix('tecnico')->group(function () {
+     Route::middleware(['role:agent|admin'])->group(function () {
+        Route::prefix('agent')->group(function () {
             Route::get('/dashboard', function () {
-                return Inertia::render('tecnico/Dashboard');
-            })->name('tecnico.dashboard');
+                return Inertia::render('dashboards/agent-dashboard');
+            })->name('agent.dashboard');
 
             Route::get('/ticket/{id}', function ($id) {
                 return Inertia::render('dashboards/detalleTicket', ['id' => $id]);
-            })->name('tecnico.ticket');
+            })->name('agent.ticket');
 
             Route::get('/total-asignados', [TecnicoController::class, 'totalTicketsAsignados']);
             Route::get('/total-en-proceso', [TecnicoController::class, 'totalTicketsEnProceso']);
