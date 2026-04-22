@@ -25,7 +25,7 @@ const ALL_TICKETS = [
         id: '#TKT-0041', subject: 'Error crítico en módulo de RRHH',
         categoryInitial: 'IT', categoryColor: '#3b82f6',
         agents: [{ name: 'Carlos M.', color: '#3b82f6' }, { name: 'Ana V.', color: '#10b981' }, { name: 'Luis H.', color: '#f59e0b' }],
-        priority: 'Urgente', progress: 60,
+        priority: 'Critico', progress: 60,
         // campos del preview (mapeados a la BD)
         code: 'TKT-2026-0041', status: 'En proceso',
         email: 'solicitante@crs.org.sv',
@@ -43,7 +43,7 @@ const ALL_TICKETS = [
         ],
         histories: [
             { user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-10 08:15' },
-            { user: { name: 'Ana Villanueva' }, action_type: 'Asignado a técnico', internal_note: 'Asignado por prioridad urgente', created_at: '2026-04-10 08:30' },
+            { user: { name: 'Ana Villanueva' }, action_type: 'Asignado a técnico', internal_note: 'Asignado por prioridad critico', created_at: '2026-04-10 08:30' },
         ],
     },
     {
@@ -158,14 +158,15 @@ const BY_CATEGORY = [
     { name: 'IT',        value: 38, color: '#3b82f6' },
     { name: 'RRHH',      value: 24, color: '#10b981' },
     { name: 'Logística', value: 20, color: '#f59e0b' },
-    { name: 'Otros',     value: 18, color: '#8b5cf6' },
+    { name: 'Bodega',     value: 18, color: '#8b5cf6' },
+
 ];
 
 const BY_PRIORITY = [
     { name: 'Baja',    total: 15, color: '#10b981' },
     { name: 'Media',   total: 42, color: '#3b82f6' },
     { name: 'Alta',    total: 27, color: '#f59e0b' },
-    { name: 'Urgente', total: 13, color: '#ef4444' },
+    { name: 'Critico', total: 13, color: '#ef4444' },
 ];
 
 const RESUMEN = [
@@ -231,9 +232,10 @@ export default function SuperAdminDashboard() {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+        // <AppLayout breadcrumbs={breadcrumbs}>
+        //     <Head title="Dashboard" />
 
+        <>
             <div className="flex flex-col gap-5 p-5">
 
                 {/* ── Barra superior ────────────────────────────────────── */}
@@ -422,7 +424,7 @@ export default function SuperAdminDashboard() {
                 ticket={selectedTicket}
                 onClose={() => setSelectedTicket(null)}
             />
-
-        </AppLayout>
+        </>
+        // </AppLayout>
     );
 }
