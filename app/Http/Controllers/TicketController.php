@@ -12,6 +12,7 @@ use App\Models\Status;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Notifications\NewTicketNotification;
+use App\Notifications\TicketAssignedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -61,28 +62,28 @@ class TicketController extends Controller
         ]);
     }
 
+    private function generateTicketCode()
+    {
+        $prefix = 'TKT';
+        $date = Carbon::now()->format('Ymd');
+        $lastTicket = Ticket::whereDate('creation_date', Carbon::today())->orderBy('id', 'desc')->first();
+        $sequence = $lastTicket ? intval(substr($lastTicket->code, -4)) + 1 : 1;
+        return sprintf('%s-%s-%04d', $prefix, $date, $sequence);
+    }
+
+
     /**
      * Store a newly created ticket (requires create_tickets permission).
      */
     public function store(StoreTicketRequest $request)
-{
-    if (!auth()->user()->can('create_tickets')) {
-        abort(403, 'No tienes permiso para crear tickets.');
-    }
+    {
+        $validated = $request->validated();
 
-    $validated = $request->validated();
-
-    DB::beginTransaction();
-
-    try {
-        $helpTopic = HelpTopic::with(['priority', 'slaPlan'])->findOrFail($validated['help_topic_id']);
-        $priority  = $helpTopic->priority;
+        $helpTopic = HelpTopic::findOrFail($validated['help_topic_id']);
         $statusOpen = Status::where('name', 'Abierto')->firstOrFail();
-
         $code = $this->generateTicketCode();
         $creationDate = Carbon::now();
 
-        // Crear el ticket
         $ticket = Ticket::create([
             'code'            => $code,
             'creation_date'   => $creationDate,
@@ -94,27 +95,18 @@ class TicketController extends Controller
             'requesting_user' => Auth::id(),
             'assigned_user'   => null,
             'help_topic_id'   => $helpTopic->id,
-            'priority_id'     => $priority->id,
+            'priority_id'     => null,
             'sla_plan_id'     => null,
             'department_id'   => $validated['department_id'],
             'status_id'       => $statusOpen->id,
         ]);
 
-        // Procesar múltiples archivos
+        // Procesar archivos
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $originalName = $file->getClientOriginalName();
-                $extension    = $file->getClientOriginalExtension();
-                $newFileName  = Str::random(40) . '.' . $extension;
-
-                $path = $file->storeAs(
-                    "tickets/{$ticket->id}",
-                    $newFileName,
-                    'public'
-                );
-
+                $path = $file->storeAs("tickets/{$ticket->id}", Str::random(40) . '.' . $file->getClientOriginalExtension(), 'public');
                 $ticket->attachments()->create([
-                    'file_name' => $originalName,
+                    'file_name' => $file->getClientOriginalName(),
                     'file_path' => $path,
                     'file_type' => $file->getMimeType(),
                     'file_size' => $file->getSize(),
@@ -122,32 +114,15 @@ class TicketController extends Controller
             }
         }
 
-        // Cargar departamento con sus jefes (precargar relación)
-        $ticket->load('department.heads');
-
-        // Notificar a los jefes del departamento
-        foreach ($ticket->department->heads as $head) {
-            $head->notify(new \App\Notifications\NewTicketNotification($ticket));
+        // Notificar jefes (sin load, verificar primero)
+        $department = Department::with('heads')->find($ticket->department_id);
+        if ($department && $department->heads->count()) {
+            foreach ($department->heads as $head) {
+                $head->notify(new NewTicketNotification($ticket));
+            }
         }
-
-        // Disparar evento
-        event(new \App\Events\TicketCreated($ticket));
-
-        DB::commit();
-
-        return redirect()->route('tickets.index')->with('success', 'Ticket creado correctamente');
-
-    } catch (\Exception $e) {
-    DB::rollBack();
-    Log::error('Error al crear ticket: ' . $e->getMessage(), [
-        'trace' => $e->getTraceAsString(),
-        'validated' => $validated,
-        'user_id' => Auth::id(),
-    ]);
-    return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
-}
-}
-
+    return redirect()->route('tickets.my')->with('success', 'Ticket creado correctamente. El jefe del departamento lo asignará.');
+    }
     /**
      * Display the specified ticket (requires view_all_tickets permission).
      */
@@ -192,22 +167,38 @@ class TicketController extends Controller
             abort(403, 'No tienes permiso para ver tickets pendientes de asignación.');
         }
 
-        $tickets = Ticket::with(['department', 'priority', 'requestingUser', 'status'])
-            ->whereNull('assigned_user')
-            ->orderBy('creation_date', 'asc')
-            ->get();
+        $user = auth()->user();
+        $departmentId = $user->department_id;
 
-        $tecnicos = User::role('agent')->get(['id', 'name']);
+        // If admin has no department, maybe show nothing? Or for superadmin all.
+        if ($user->hasRole('superadmin')) {
+            $tickets = Ticket::with(['department', 'priority', 'requestingUser', 'status'])
+                ->whereNull('assigned_user')
+                ->orderBy('creation_date', 'asc')
+                ->get();
+            $tecnicos = User::role('agent')->get(['id', 'name']);
+        } else {
+            // Only tickets from admin's department
+            $tickets = Ticket::with(['department', 'priority', 'requestingUser', 'status'])
+                ->whereNull('assigned_user')
+                ->where('department_id', $departmentId)
+                ->orderBy('creation_date', 'asc')
+                ->get();
+            // Only agents from the same department
+            $tecnicos = User::role('agent')
+                ->where('department_id', $departmentId)
+                ->get(['id', 'name']);
+        }
 
         return Inertia::render('tickets/unassigned', [
             'tickets' => $tickets,
             'tecnicos' => $tecnicos
         ]);
     }
-
     /**
      * Assign a technician to a ticket (requires assign_tickets permission).
      */
+
     public function assign(Request $request, Ticket $ticket)
     {
         if (!auth()->user()->can('assign_tickets')) {
@@ -218,7 +209,19 @@ class TicketController extends Controller
             'tecnico_id' => 'required|exists:users,id'
         ]);
 
-        $ticket->assigned_user = $request->tecnico_id;
+        $tecnico = User::find($request->tecnico_id);
+
+        // Verificar que el técnico pertenezca al mismo departamento que el ticket
+        if ($tecnico->department_id !== $ticket->department_id) {
+            return back()->with('error', 'El técnico debe pertenecer al departamento del ticket.');
+        }
+
+        // Verificar que el ticket no esté ya asignado
+        if ($ticket->assigned_user) {
+            return back()->with('error', 'Este ticket ya está asignado a un técnico.');
+        }
+
+        $ticket->assigned_user = $tecnico->id;
 
         $statusInProgress = Status::where('name', 'En Proceso')->first();
         if ($statusInProgress) {
@@ -227,7 +230,13 @@ class TicketController extends Controller
 
         $ticket->save();
 
-        return back()->with('success', 'Técnico asignado y ticket marcado "En Proceso" exitosamente.');
+        // Notificar al técnico
+        $tecnico->notify(new TicketAssignedNotification($ticket));
+
+        // Redirigir a la lista de pendientes (página de donde vino) con mensaje
+        return redirect()->route('tickets.unassigned')->with('success', "Ticket {$ticket->code} asignado a {$tecnico->name} correctamente.");
     }
+
+
 
 }

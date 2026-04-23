@@ -3,28 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class NotificationController extends Controller
 {
-    public function markAsRead($id)
+    /**
+     * Obtener las últimas notificaciones para el dropdown.
+     */
+    public function fetch(Request $request)
     {
-        $notification = auth()->user()->notifications()->findOrFail($id);
-        $notification->markAsRead();
-        return response()->json(['success' => true]);
-    }
-
-    public function markAllRead()
-    {
-        auth()->user()->unreadNotifications->markAsRead();
-        return response()->json(['success' => true]);
-    }
-
-    public function index()
-    {
-        $notifications = auth()->user()->notifications()->paginate(20);
-        return Inertia::render('Notifications/Index', [
-            'notifications' => $notifications,
+        $user = $request->user();
+        return response()->json([
+            'notifications' => $user->notifications()->take(10)->get(),
+            'unread_count' => $user->unreadNotifications->count(),
         ]);
+    }
+
+    /**
+     * Marcar una notificación como leída y redirigir a la URL asociada.
+     */
+    public function markAsRead($id, Request $request)
+    {
+        $notification = $request->user()->notifications()->findOrFail($id);
+        $url = $notification->data['url'] ?? route('dashboard');
+        $notification->markAsRead();
+        return redirect()->to($url);
+    }
+
+    /**
+     * Marcar todas las notificaciones como leídas.
+     */
+    public function markAllAsRead(Request $request)
+    {
+        $request->user()->unreadNotifications->markAsRead();
+        return redirect()->back();
     }
 }

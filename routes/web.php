@@ -26,9 +26,13 @@ Route::middleware(['auth'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+   Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::get('/notifications/fetch', [NotificationController::class, 'fetch'])->name('notifications.fetch');
+
+    
+
+    Route::post('/tickets/{ticket}/asignar', [TicketController::class, 'assign'])->name('tickets.assign');
     // ==========================================
     // NUEVO: RUTAS ESPECÍFICAS PARA TICKETS (antes del resource)
     // ==========================================
@@ -42,6 +46,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/tickets/pendientes', [TicketController::class, 'unassigned'])->name('tickets.unassigned');
         Route::post('/tickets/{ticket}/asignar', [TicketController::class, 'assign'])->name('tickets.assign');
     });
+
+
 
     // --- C. CRUD DE TICKETS con permisos granulares ---
     // MODIFICADO: Se añaden middlewares de permiso a cada método del resource
