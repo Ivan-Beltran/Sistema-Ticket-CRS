@@ -52,16 +52,24 @@ export default function TicketsTable({ tickets = [], total = 0, onExport, onVerT
                     <h3 className="text-base font-medium text-gray-900 dark:text-white">Tickets activos</h3>
                     <p className="mt-0.5 text-xs text-gray-400">
                         <span className="font-medium text-gray-700 dark:text-gray-300">30 resueltos</span>{' '}
-                        este mes — <span className="text-blue-500 cursor-pointer hover:underline" onClick={onVerTodos}>ver todos</span>
+                        este mes
                     </p>
                 </div>
-                <button
-                    onClick={onExport}
-                    className="flex items-center gap-1.5 rounded-lg border border-sidebar-border px-3 py-1.5 text-[11px] font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-sidebar-accent"
-                >
-                    <Download size={13} />
-                    Exportar
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={onExport}
+                        className="flex items-center gap-1.5 rounded-lg border border-sidebar-border px-3 py-1.5 text-[11px] font-medium text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-sidebar-accent"
+                    >
+                        <Download size={13} />
+                        Exportar
+                    </button>
+                    <button
+                        onClick={onVerTodos}
+                        className="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-medium text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400"
+                    >
+                        Ver todos
+                    </button>
+                </div>
             </div>
 
             {/* tabla */}
