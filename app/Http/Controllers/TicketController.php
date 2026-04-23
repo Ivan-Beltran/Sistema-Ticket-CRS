@@ -138,10 +138,14 @@ class TicketController extends Controller
         return redirect()->route('tickets.index')->with('success', 'Ticket creado correctamente');
 
     } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error al crear ticket: ' . $e->getMessage());
-        return redirect()->back()->withInput()->with('error', 'Ocurrió un error: ' . $e->getMessage());
-    }
+    DB::rollBack();
+    Log::error('Error al crear ticket: ' . $e->getMessage(), [
+        'trace' => $e->getTraceAsString(),
+        'validated' => $validated,
+        'user_id' => Auth::id(),
+    ]);
+    return redirect()->back()->withInput()->with('error', 'Error: ' . $e->getMessage());
+}
 }
 
     /**

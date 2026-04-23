@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -25,6 +26,9 @@ Route::middleware(['auth'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     // ==========================================
     // NUEVO: RUTAS ESPECÍFICAS PARA TICKETS (antes del resource)
     // ==========================================
