@@ -124,28 +124,28 @@ export default function AgentDashboard() {
         <div className="mx-auto flex h-full w-full flex-col space-y-6 p-4 font-sans text-gray-800 sm:p-6 md:p-6 lg:p-8">
             {/* KPI Cards */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                <div className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors hover:border-red-200">
-                    <div className="mb-1 text-sm font-semibold text-gray-600">Tickets Asignados</div>
-                    <div className="text-3xl font-bold">{stats.total_tickets_asignados}</div>
+                <div className="group relative flex flex-col overflow-hidden rounded-xl border border-red-50 bg-gradient-to-br from-red-50 to-red-100 p-5 shadow-sm transition-colors hover:border-red-100">
+                    <div className="mb-1 text-sm font-semibold text-red-700">Tickets Asignados</div>
+                    <div className="text-3xl font-bold text-red-800">{stats.total_tickets_asignados}</div>
                     <AlertCircle
-                        className="absolute top-1/2 right-5 h-8 w-8 -translate-y-1/2 text-red-100 transition-colors group-hover:text-red-400"
-                        opacity={0.6}
+                        className="absolute top-1/2 right-5 h-8 w-8 -translate-y-1/2 text-red-300 transition-colors group-hover:text-red-400"
+                        opacity={0.8}
                     />
                 </div>
-                <div className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors hover:border-orange-200">
-                    <div className="mb-1 text-sm font-semibold text-gray-600">En Proceso</div>
-                    <div className="text-3xl font-bold">{stats.total_tickets_proceso}</div>
+                <div className="group relative flex flex-col overflow-hidden rounded-xl border border-orange-50 bg-gradient-to-br from-orange-50 to-orange-100 p-5 shadow-sm transition-colors hover:border-orange-100">
+                    <div className="mb-1 text-sm font-semibold text-orange-700">En Proceso</div>
+                    <div className="text-3xl font-bold text-orange-800">{stats.total_tickets_proceso}</div>
                     <Clock
-                        className="absolute top-1/2 right-5 h-8 w-8 -translate-y-1/2 text-orange-100 transition-colors group-hover:text-orange-400"
-                        opacity={0.6}
+                        className="absolute top-1/2 right-5 h-8 w-8 -translate-y-1/2 text-orange-300 transition-colors group-hover:text-orange-400"
+                        opacity={0.8}
                     />
                 </div>
-                <div className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors hover:border-green-200">
-                    <div className="mb-1 text-sm font-semibold text-gray-600">Total Resueltos</div>
-                    <div className="text-3xl font-bold">{stats.total_tickets_resueltos}</div>
+                <div className="group relative flex flex-col overflow-hidden rounded-xl border border-green-50 bg-gradient-to-br from-green-50 to-green-100 p-5 shadow-sm transition-colors hover:border-green-100">
+                    <div className="mb-1 text-sm font-semibold text-green-700">Total Resueltos</div>
+                    <div className="text-3xl font-bold text-green-800">{stats.total_tickets_resueltos}</div>
                     <CheckCircle2
-                        className="absolute top-1/2 right-5 h-8 w-8 -translate-y-1/2 text-green-100 transition-colors group-hover:text-green-400"
-                        opacity={0.6}
+                        className="absolute top-1/2 right-5 h-8 w-8 -translate-y-1/2 text-green-300 transition-colors group-hover:text-green-400"
+                        opacity={0.8}
                     />
                 </div>
             </div>
@@ -406,10 +406,10 @@ export default function AgentDashboard() {
                                             <td className="px-4 py-4 text-xs leading-tight text-gray-500">
                                                 <div dangerouslySetInnerHTML={{ __html: (row.creado_por || '').replace('\n', '<br/>') }} />
                                             </td>
-                                            <td className="flex min-w-[140px] flex-col items-center gap-1.5 px-4 py-4">
+                                            <td className="flex min-w-[160px] flex-col items-center gap-3 px-4 py-4">
                                                 <Link
                                                     href={`/agent/ticket/${row.id}`}
-                                                    className="w-full max-w-[120px] rounded bg-blue-500 px-3 py-1.5 text-center text-[10px] font-bold text-white shadow-sm transition-colors hover:bg-blue-600"
+                                                    className="w-full rounded bg-blue-500 px-4 py-3 text-center text-xs font-bold text-white shadow-sm transition-colors hover:bg-blue-600"
                                                 >
                                                     Ver Detalles
                                                 </Link>
@@ -418,8 +418,21 @@ export default function AgentDashboard() {
                                                     const statusLower = status.toLowerCase();
                                                     const isClosedOrResolved =
                                                         statusLower === 'cerrado' || statusLower === 'resuelto' || statusLower === 'finalizado';
+                                                    const tieneDiagnostico = row.tiene_diagnostico;
 
-                                                    if (!isClosedOrResolved) {
+                                                    if (isClosedOrResolved) {
+                                                        return (
+                                                            <div className="w-full px-4 py-3 text-center text-xs font-medium text-green-600">
+                                                                Diagnóstico Realizado
+                                                            </div>
+                                                        );
+                                                    } else if (tieneDiagnostico) {
+                                                        return (
+                                                            <div className="w-full px-4 py-3 text-center text-xs font-medium text-green-600">
+                                                                Diagnóstico Realizado
+                                                            </div>
+                                                        );
+                                                    } else {
                                                         return (
                                                             <button
                                                                 onClick={() => {
@@ -431,16 +444,10 @@ export default function AgentDashboard() {
                                                                             ?.scrollIntoView({ behavior: 'smooth' });
                                                                     }, 100);
                                                                 }}
-                                                                className="w-full max-w-[120px] rounded bg-red-500 px-3 py-1.5 text-[10px] font-bold text-white shadow-sm transition-colors hover:bg-red-600"
+                                                                className="w-full rounded bg-red-500 px-4 py-3 text-xs font-bold text-white shadow-sm transition-colors hover:bg-red-600"
                                                             >
                                                                 Realizar Diagnostico
                                                             </button>
-                                                        );
-                                                    } else {
-                                                        return (
-                                                            <div className="w-full max-w-[120px] px-3 py-1.5 text-center text-[10px] font-medium text-gray-400">
-                                                                Ticket Cerrado
-                                                            </div>
                                                         );
                                                     }
                                                 })()}
@@ -486,7 +493,10 @@ export default function AgentDashboard() {
                         <p className="mb-4 text-[13px] font-medium text-gray-700">Seleccione el tipo de diagnóstico realizado (Opcional):</p>
                         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                             <button
-                                onClick={() => setTipoDiagnostico('Problema de Hardware')}
+                                onClick={() => {
+                                    setTipoDiagnostico('Problema de Hardware');
+                                    setShowCustomDiagnostic(false);
+                                }}
                                 className={`group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all ${
                                     tipoDiagnostico === 'Problema de Hardware'
                                         ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
@@ -501,7 +511,10 @@ export default function AgentDashboard() {
                             </button>
 
                             <button
-                                onClick={() => setTipoDiagnostico('Problema de Software')}
+                                onClick={() => {
+                                    setTipoDiagnostico('Problema de Software');
+                                    setShowCustomDiagnostic(false);
+                                }}
                                 className={`group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all ${
                                     tipoDiagnostico === 'Problema de Software'
                                         ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
@@ -518,7 +531,10 @@ export default function AgentDashboard() {
                             </button>
 
                             <button
-                                onClick={() => setTipoDiagnostico('Problema de Red')}
+                                onClick={() => {
+                                    setTipoDiagnostico('Problema de Red');
+                                    setShowCustomDiagnostic(false);
+                                }}
                                 className={`group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all ${
                                     tipoDiagnostico === 'Problema de Red'
                                         ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200'
@@ -533,7 +549,10 @@ export default function AgentDashboard() {
                             </button>
 
                             <button
-                                onClick={() => setTipoDiagnostico('Equipo Médico')}
+                                onClick={() => {
+                                    setTipoDiagnostico('Equipo Médico');
+                                    setShowCustomDiagnostic(false);
+                                }}
                                 className={`group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all ${
                                     tipoDiagnostico === 'Equipo Médico'
                                         ? 'border-red-500 bg-red-50 ring-2 ring-red-200'
@@ -548,7 +567,10 @@ export default function AgentDashboard() {
                             </button>
 
                             <button
-                                onClick={() => setTipoDiagnostico('Sistema de Emergencias')}
+                                onClick={() => {
+                                    setTipoDiagnostico('Sistema de Emergencias');
+                                    setShowCustomDiagnostic(false);
+                                }}
                                 className={`group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all ${
                                     tipoDiagnostico === 'Sistema de Emergencias'
                                         ? 'border-orange-500 bg-orange-50 ring-2 ring-orange-200'
@@ -563,7 +585,10 @@ export default function AgentDashboard() {
                             </button>
 
                             <button
-                                onClick={() => setTipoDiagnostico('Infraestructura')}
+                                onClick={() => {
+                                    setTipoDiagnostico('Infraestructura');
+                                    setShowCustomDiagnostic(false);
+                                }}
                                 className={`group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all ${
                                     tipoDiagnostico === 'Infraestructura'
                                         ? 'border-green-500 bg-green-50 ring-2 ring-green-200'
@@ -578,7 +603,10 @@ export default function AgentDashboard() {
                             </button>
 
                             <button
-                                onClick={() => setTipoDiagnostico('Sistema de Comunicación')}
+                                onClick={() => {
+                                    setTipoDiagnostico('Sistema de Comunicación');
+                                    setShowCustomDiagnostic(false);
+                                }}
                                 className={`group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all ${
                                     tipoDiagnostico === 'Sistema de Comunicación'
                                         ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
@@ -593,7 +621,10 @@ export default function AgentDashboard() {
                             </button>
 
                             <button
-                                onClick={() => setShowCustomDiagnostic(true)}
+                                onClick={() => {
+                                    setTipoDiagnostico('');
+                                    setShowCustomDiagnostic(true);
+                                }}
                                 className={`group flex flex-col items-center justify-center rounded-xl border-2 p-4 transition-all ${
                                     showCustomDiagnostic
                                         ? 'border-gray-600 bg-gray-50 ring-2 ring-gray-200'
@@ -643,16 +674,37 @@ export default function AgentDashboard() {
                             <input
                                 type="file"
                                 multiple
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi,.wmv"
                                 className="block w-full cursor-pointer text-sm text-gray-500 transition-colors file:mr-4 file:rounded file:border-0 file:bg-red-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-red-700 hover:file:bg-red-100"
                                 onChange={(e) => {
                                     if (e.target.files) {
                                         const filesArray = Array.from(e.target.files);
+                                        // Validar tipos de archivo
+                                        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv'];
+                                        
+                                        const maxSize = 10 * 1024 * 1024; // 10MB por archivo
+                                        const validFiles = [];
+                                        
+                                        for (const file of filesArray) {
+                                            if (!allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|jpg|jpeg|png|gif|mp4|mov|avi|wmv)$/i)) {
+                                                alert(`El archivo "${file.name}" no es un tipo permitido.`);
+                                                continue;
+                                            }
+                                            
+                                            if (file.size > maxSize) {
+                                                alert(`El archivo "${file.name}" excede el tamaño máximo de 10MB.`);
+                                                continue;
+                                            }
+                                            
+                                            validFiles.push(file);
+                                        }
+                                        
                                         // Maximo 4 archivos para no romper limite de DB
-                                        if (filesArray.length > 4) {
+                                        if (validFiles.length > 4) {
                                             alert('Se permite un máximo de 4 archivos.');
-                                            setAdjuntosDiagnostico(filesArray.slice(0, 4));
+                                            setAdjuntosDiagnostico(validFiles.slice(0, 4));
                                         } else {
-                                            setAdjuntosDiagnostico(filesArray);
+                                            setAdjuntosDiagnostico(validFiles);
                                         }
                                     }
                                 }}

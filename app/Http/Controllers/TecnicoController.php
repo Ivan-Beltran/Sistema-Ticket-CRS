@@ -65,7 +65,7 @@ class TecnicoController extends Controller
             $statusPendienteRevision = Status::where('name', 'Pendiente Revisión')->first();
         }
 
-        $query = Ticket::with(['priority', 'department', 'status', 'requestingUser'])
+        $query = Ticket::with(['priority', 'department', 'status', 'requestingUser', 'ticketSolutions'])
             ->where('assigned_user', $agent->id);
 
         if ($statusPendienteRevision) {
@@ -89,7 +89,8 @@ class TecnicoController extends Controller
                 'estado' => $ticket->status->name ?? 'N/A',
                 'prioridad' => $ticket->priority->name ?? 'N/A',
                 'creado_por' => $ticket->requestingUser->name ?? 'N/A',
-                'fecha_creacion' => $ticket->creation_date
+                'fecha_creacion' => $ticket->creation_date,
+                'tiene_diagnostico' => $ticket->ticketSolutions->count() > 0
             ];
         });
 
@@ -351,7 +352,7 @@ class TecnicoController extends Controller
             'nombre' => $ticket->requestingUser->name ?? 'N/A',
             'email' => $ticket->email,
             'telefono' => $ticket->requestingUser->phone_number ?? 'N/A',
-            'temas_de_ayuda' => $ticket->helpTopic->name ?? 'N/A',
+            'temas_de_ayuda' => $ticket->helpTopic->name_topic ?? 'N/A',
             'departamento_solicitante' => $ticket->department->name ?? 'N/A',
             'solicitante' => $ticket->requestingUser->name ?? 'N/A',
             'problema' => $ticket->subject,
@@ -462,15 +463,15 @@ class TecnicoController extends Controller
             'files_count' => $filesProcessed
         ]);
 
-        $estadoRevision = Status::where('name', 'like', '%Revisión%')
-            ->orWhere('name', 'like', '%revision%')
+        $estadoResuelto = Status::where('name', 'like', '%Resuelto%')
+            ->orWhere('name', 'like', '%resuelto%')
             ->first();
 
-        if (!$estadoRevision) {
-            $estadoRevision = Status::firstOrCreate(['name' => 'Pendiente Revisión']);
+        if (!$estadoResuelto) {
+            $estadoResuelto = Status::firstOrCreate(['name' => 'Resuelto']);
         }
 
-        $ticket->status_id = $estadoRevision->id;
+        $ticket->status_id = $estadoResuelto->id;
         $ticket->save();
 
         return response()->json([
