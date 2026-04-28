@@ -12,16 +12,17 @@ import TicketsTable           from '@/components/componts-dashadmin/TicketsTable
 
 // ─── datos estáticos ──────────────────────────────────────────────────────────
 // TODO: reemplazar con props de Inertia cuando esté listo el backend
+// Nota: agents[0] = agente principal asignado (el que se muestra en la tabla)
 
 const ALL_TICKETS = [
     {
         id: '#TKT-0041', subject: 'Error crítico en módulo de RRHH',
         categoryInitial: 'IT', categoryColor: '#3b82f6',
-        agents: [{ name: 'Carlos M.', color: '#3b82f6' }, { name: 'Ana V.', color: '#10b981' }, { name: 'Luis H.', color: '#f59e0b' }],
+        agents: [{ name: 'Carlos M.', color: '#3b82f6' }],
         priority: 'Critico', progress: 60,
         code: 'TKT-2026-0041', status: 'En proceso',
         email: 'solicitante@crs.org.sv',
-        message: 'El módulo de gestión de RRHH presenta un error 500 al intentar guardar cambios en el perfil de empleados. El problema afecta a todos los usuarios del departamento desde las 08:00 del día de hoy.',
+        message: 'El módulo de gestión de RRHH presenta un error 500 al intentar guardar cambios en el perfil de empleados.',
         creation_date: '2026-04-10', expiration_date: '2026-04-12', closing_date: null,
         requesting_user: { name: 'Roberto Flores' },
         assigned_user:   { name: 'Carlos Mendoza' },
@@ -30,12 +31,12 @@ const ALL_TICKETS = [
         sla_plan:        { name: 'Crítico', grace_time_hours: 4 },
         attach: null,
         solutions: [
-            { user: { name: 'Carlos Mendoza' }, message: 'Se identificó el problema: conflicto en la migración de base de datos. Trabajando en el rollback.', date: '2026-04-10', type: 'internal_note' },
-            { user: { name: 'Carlos Mendoza' }, message: 'Se aplicó el rollback correctamente. El sistema está operativo. Monitoreando estabilidad.', date: '2026-04-11', type: 'public_reply' },
+            { user: { name: 'Carlos Mendoza' }, message: 'Se identificó conflicto en la migración de BD. Trabajando en rollback.', date: '2026-04-10', type: 'internal_note' },
+            { user: { name: 'Carlos Mendoza' }, message: 'Rollback aplicado. Sistema operativo, monitoreando estabilidad.', date: '2026-04-11', type: 'public_reply' },
         ],
         histories: [
-            { user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-10 08:15' },
-            { user: { name: 'Ana Villanueva' }, action_type: 'Asignado a técnico', internal_note: 'Asignado por prioridad critico', created_at: '2026-04-10 08:30' },
+            { user: { name: 'Sistema' },        action_type: 'Ticket creado',    internal_note: '',                          created_at: '2026-04-10 08:15' },
+            { user: { name: 'Ana Villanueva' },  action_type: 'Asignado a técnico', internal_note: 'Asignado por prioridad crítica', created_at: '2026-04-10 08:30' },
         ],
     },
     {
@@ -45,7 +46,7 @@ const ALL_TICKETS = [
         priority: null, progress: 10,
         code: 'TKT-2026-0040', status: 'Abierto',
         email: 'logistica@crs.org.sv',
-        message: 'Se requiere la adquisición de 3 tablets para el equipo de logística de campo que coordina las operaciones en zonas de desastre.',
+        message: 'Se requiere la adquisición de 3 tablets para el equipo de logística de campo.',
         creation_date: '2026-04-08', expiration_date: '2026-04-22', closing_date: null,
         requesting_user: { name: 'Laura Martínez' },
         assigned_user:   { name: 'María González' },
@@ -53,18 +54,16 @@ const ALL_TICKETS = [
         help_topic:      { name_topic: 'Solicitud de equipo' },
         sla_plan:        { name: 'Estándar', grace_time_hours: 72 },
         attach: null, solutions: [],
-        histories: [
-            { user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-08 09:00' },
-        ],
+        histories: [{ user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-08 09:00' }],
     },
     {
         id: '#TKT-0039', subject: 'Falla en plataforma de capacitación',
         categoryInitial: 'CP', categoryColor: '#10b981',
-        agents: [{ name: 'Pedro S.', color: '#ef4444' }, { name: 'Sandra L.', color: '#06b6d4' }],
+        agents: [{ name: 'Pedro S.', color: '#ef4444' }],
         priority: 'Media', progress: 100,
         code: 'TKT-2026-0039', status: 'Resuelto',
         email: 'capacitacion@crs.org.sv',
-        message: 'La plataforma e-learning no permite cargar los videos del módulo de primeros auxilios. Los usuarios reciben un error 413 al intentar subir archivos mayores a 10MB.',
+        message: 'La plataforma e-learning no permite cargar videos. Error 413 al subir archivos mayores a 10MB.',
         creation_date: '2026-04-05', expiration_date: '2026-04-09', closing_date: '2026-04-08',
         requesting_user: { name: 'Carmen López' },
         assigned_user:   { name: 'Pedro Sánchez' },
@@ -72,22 +71,20 @@ const ALL_TICKETS = [
         help_topic:      { name_topic: 'Plataformas educativas' },
         sla_plan:        { name: 'Normal', grace_time_hours: 24 },
         attach: null,
-        solutions: [
-            { user: { name: 'Pedro Sánchez' }, message: 'Se aumentó el límite de carga a 50MB en la configuración del servidor nginx. Problema resuelto.', date: '2026-04-08', type: 'public_reply' },
-        ],
+        solutions: [{ user: { name: 'Pedro Sánchez' }, message: 'Se aumentó límite a 50MB en nginx. Resuelto.', date: '2026-04-08', type: 'public_reply' }],
         histories: [
-            { user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-05 14:00' },
-            { user: { name: 'Pedro Sánchez' }, action_type: 'Resuelto', internal_note: 'Configuración nginx actualizada', created_at: '2026-04-08 11:00' },
+            { user: { name: 'Sistema' },        action_type: 'Ticket creado', internal_note: '',                       created_at: '2026-04-05 14:00' },
+            { user: { name: 'Pedro Sánchez' },  action_type: 'Resuelto',      internal_note: 'Configuración nginx OK', created_at: '2026-04-08 11:00' },
         ],
     },
     {
         id: '#TKT-0038', subject: 'Implementar app móvil de donaciones',
         categoryInitial: 'DV', categoryColor: '#10b981',
-        agents: [{ name: 'Carlos M.', color: '#3b82f6' }, { name: 'Ana V.', color: '#10b981' }, { name: 'Luis H.', color: '#f59e0b' }, { name: 'Pedro S.', color: '#ef4444' }],
+        agents: [{ name: 'Carlos M.', color: '#3b82f6' }],
         priority: 'Alta', progress: 100,
         code: 'TKT-2026-0038', status: 'Cerrado',
         email: 'desarrollo@crs.org.sv',
-        message: 'Desarrollo e implementación de la app móvil para recepción de donaciones en línea. Incluye integración con pasarela de pagos y notificaciones push.',
+        message: 'Desarrollo e implementación de app móvil para recepción de donaciones en línea.',
         creation_date: '2026-03-01', expiration_date: '2026-04-01', closing_date: '2026-03-30',
         requesting_user: { name: 'Dirección General' },
         assigned_user:   { name: 'Carlos Mendoza' },
@@ -103,7 +100,7 @@ const ALL_TICKETS = [
         priority: 'Baja', progress: 25,
         code: 'TKT-2026-0037', status: 'En proceso',
         email: 'voluntarios@crs.org.sv',
-        message: 'El portal de registro de voluntarios necesita actualización de diseño y corrección de formularios que no envían correctamente los datos de disponibilidad.',
+        message: 'El portal de voluntarios necesita actualización de diseño y corrección de formularios.',
         creation_date: '2026-04-12', expiration_date: '2026-04-26', closing_date: null,
         requesting_user: { name: 'Coordinación Voluntarios' },
         assigned_user:   { name: 'Sandra Luna' },
@@ -111,18 +108,16 @@ const ALL_TICKETS = [
         help_topic:      { name_topic: 'Portales web' },
         sla_plan:        { name: 'Normal', grace_time_hours: 72 },
         attach: null, solutions: [],
-        histories: [
-            { user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-12 10:00' },
-        ],
+        histories: [{ user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-12 10:00' }],
     },
     {
         id: '#TKT-0036', subject: 'Rediseño del portal administrativo',
         categoryInitial: 'UX', categoryColor: '#f43f5e',
-        agents: [{ name: 'María G.', color: '#8b5cf6' }, { name: 'Ana V.', color: '#10b981' }],
+        agents: [{ name: 'María G.', color: '#8b5cf6' }],
         priority: 'Media', progress: 40,
         code: 'TKT-2026-0036', status: 'En proceso',
         email: 'admin@crs.org.sv',
-        message: 'Se requiere rediseño completo del portal administrativo para mejorar la experiencia de usuario, modernizar la interfaz y optimizar los flujos de trabajo del personal.',
+        message: 'Rediseño completo del portal administrativo para mejorar UX y optimizar flujos de trabajo.',
         creation_date: '2026-04-01', expiration_date: '2026-04-30', closing_date: null,
         requesting_user: { name: 'Gerencia Administrativa' },
         assigned_user:   { name: 'María González' },
@@ -130,6 +125,75 @@ const ALL_TICKETS = [
         help_topic:      { name_topic: 'UX / Diseño' },
         sla_plan:        { name: 'Proyecto', grace_time_hours: 240 },
         attach: null, solutions: [], histories: [],
+    },
+    // ── 4 tickets extra para probar la paginación ──
+    {
+        id: '#TKT-0035', subject: 'Configurar servidor de correo institucional',
+        categoryInitial: 'IT', categoryColor: '#3b82f6',
+        agents: [{ name: 'Luis H.', color: '#f59e0b' }],
+        priority: 'Alta', progress: 80,
+        code: 'TKT-2026-0035', status: 'En proceso',
+        email: 'sistemas@crs.org.sv',
+        message: 'El servidor de correo presenta intermitencias en el envío de notificaciones automáticas del sistema.',
+        creation_date: '2026-04-14', expiration_date: '2026-04-18', closing_date: null,
+        requesting_user: { name: 'Jefatura IT' },
+        assigned_user:   { name: 'Luis Herrera' },
+        department:      { name: 'Tecnología Informática' },
+        help_topic:      { name_topic: 'Servidores' },
+        sla_plan:        { name: 'Urgente', grace_time_hours: 8 },
+        attach: null, solutions: [],
+        histories: [{ user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-14 07:00' }],
+    },
+    {
+        id: '#TKT-0034', subject: 'Reportes de bodega no generan PDF',
+        categoryInitial: 'BD', categoryColor: '#8b5cf6',
+        agents: [{ name: 'Ana V.', color: '#10b981' }],
+        priority: 'Media', progress: 50,
+        code: 'TKT-2026-0034', status: 'En proceso',
+        email: 'bodega@crs.org.sv',
+        message: 'El módulo de bodega falla al intentar generar reportes en formato PDF. El proceso queda colgado.',
+        creation_date: '2026-04-13', expiration_date: '2026-04-20', closing_date: null,
+        requesting_user: { name: 'Encargado de Bodega' },
+        assigned_user:   { name: 'Ana Villanueva' },
+        department:      { name: 'Bodega' },
+        help_topic:      { name_topic: 'Reportes' },
+        sla_plan:        { name: 'Normal', grace_time_hours: 48 },
+        attach: null, solutions: [],
+        histories: [{ user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-13 11:30' }],
+    },
+    {
+        id: '#TKT-0033', subject: 'Acceso denegado al módulo de RRHH',
+        categoryInitial: 'RH', categoryColor: '#10b981',
+        agents: [{ name: 'Carlos M.', color: '#3b82f6' }],
+        priority: 'Baja', progress: 15,
+        code: 'TKT-2026-0033', status: 'Abierto',
+        email: 'rrhh@crs.org.sv',
+        message: 'Dos usuarios del departamento de RRHH no pueden acceder al módulo de nómina. Error de permisos.',
+        creation_date: '2026-04-15', expiration_date: '2026-04-22', closing_date: null,
+        requesting_user: { name: 'RRHH - Coordinación' },
+        assigned_user:   { name: 'Carlos Mendoza' },
+        department:      { name: 'RRHH' },
+        help_topic:      { name_topic: 'Permisos y accesos' },
+        sla_plan:        { name: 'Estándar', grace_time_hours: 72 },
+        attach: null, solutions: [],
+        histories: [{ user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-15 08:45' }],
+    },
+    {
+        id: '#TKT-0032', subject: 'Actualización de inventario no sincroniza',
+        categoryInitial: 'BD', categoryColor: '#8b5cf6',
+        agents: [{ name: 'Pedro S.', color: '#ef4444' }],
+        priority: 'Alta', progress: 35,
+        code: 'TKT-2026-0032', status: 'En proceso',
+        email: 'inventario@crs.org.sv',
+        message: 'Los cambios realizados en inventario no se sincronizan correctamente con el sistema central.',
+        creation_date: '2026-04-11', expiration_date: '2026-04-17', closing_date: null,
+        requesting_user: { name: 'Jefe de Inventario' },
+        assigned_user:   { name: 'Pedro Sánchez' },
+        department:      { name: 'Bodega' },
+        help_topic:      { name_topic: 'Sincronización de datos' },
+        sla_plan:        { name: 'Urgente', grace_time_hours: 12 },
+        attach: null, solutions: [],
+        histories: [{ user: { name: 'Sistema' }, action_type: 'Ticket creado', internal_note: '', created_at: '2026-04-11 15:00' }],
     },
 ];
 
@@ -279,7 +343,6 @@ export default function SuperAdminDashboard() {
 
             {/* ── 2a. Gráficas fila 1: área + donut ─────────────────────── */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-
                 <div className="lg:col-span-2">
                     <DashCard
                         title="Tickets por mes"
@@ -339,7 +402,6 @@ export default function SuperAdminDashboard() {
 
             {/* ── 2b. Gráficas fila 2: barras + resumen + agentes ───────── */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-
                 <DashCard title="Por prioridad">
                     <div style={{ height: 180 }}>
                         <ResponsiveContainer width="100%" height="100%">
@@ -388,7 +450,7 @@ export default function SuperAdminDashboard() {
                 tickets={filteredTickets}
                 total={filteredTickets.length}
                 onExport={() => setExportOpen(true)}
-                onVerTodos={() => { /* route('tickets.index') cuando esté listo */ }}
+                onVerTodos={() => window.location.href = '/tickets'}
                 onSelectTicket={(t) => setSelectedTicket(t)}
             />
 
