@@ -9,6 +9,7 @@ use App\Http\Controllers\SlaPlanController;
 use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\TecnicoController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\QualificationController;
 
 // ==========================================
 // 1. RUTAS PÚBLICAS
@@ -82,6 +83,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/tickets-asignados', [TecnicoController::class, 'ticketsAsignados']);
         Route::get('/ver-ticket/{id}', [TecnicoController::class, 'verTicket']);
         Route::post('/ticket/{id}/diagnostico', [TecnicoController::class, 'guardarDiagnostico']);
+        Route::post('/ticket/{id}/no-resolver', [TecnicoController::class, 'noPuedeResolver']);
     });
 
     // --- E. CATÁLOGOS (solo usuarios con permiso) ---
@@ -94,6 +96,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['permission:manage_users'])->group(function () {
         Route::resource('users', UserController::class);
     });
+
+    Route::post('/qualifications', [QualificationController::class, 'store']);
 });
 
 // ==========================================

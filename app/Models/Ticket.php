@@ -72,12 +72,22 @@ class Ticket extends Model
 
     public function qualification():HasOne
     {
-        return $this->hasOne(Qualification::class);
+        return $this->hasOne(Qualification::class,'ticket_id', 'id') ;
     }
 
     public function ticketSolutions(): HasMany
     {
         return $this->hasMany(TicketSolution::class);
+    }
+
+    public function solutions(): HasMany
+    {
+        return $this->hasMany(TicketSolution::class);
+    }
+
+    public function incidents(): HasMany
+    {
+        return $this->hasMany(TicketIncident::class);
     }
 
     public function histories():HasMany
@@ -98,6 +108,7 @@ class Ticket extends Model
         // Al eliminar el ticket...
         static::deleting(function ($ticket) {
             $ticket->ticketSolutions()->delete();
+            $ticket->incidents()->delete();
             $ticket->histories()->delete();
             $ticket->qualification()->delete();
         });
@@ -105,6 +116,7 @@ class Ticket extends Model
         // Al restaurar el ticket...
         static::restoring(function ($ticket) {
             $ticket->ticketSolutions()->withTrashed()->restore();
+            $ticket->incidents()->withTrashed()->restore();
             $ticket->histories()->withTrashed()->restore();
             $ticket->qualification()->withTrashed()->restore();
         });
