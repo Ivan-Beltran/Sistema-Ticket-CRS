@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import axios from "axios"; // 🔥 importante
+import axios from "axios"; 
 
 export default function TicketRatingModal({ isOpen, onClose, ticket, onNext }) {
   const [rating, setRating] = useState(0);
@@ -19,13 +19,13 @@ export default function TicketRatingModal({ isOpen, onClose, ticket, onNext }) {
     ? new Date(ticket.created_at).toLocaleDateString("es-ES")
     : "N/A";
 
-  // 🔥 AQUÍ ESTÁ LA MAGIA
+  
   const handleEnviar = async () => {
     try {
       await axios.post("/qualifications", {
         score: rating,
         comment: comentario,
-        ticket_id: ticket?.ticket?.id, // 👈 clave
+        ticket_id: ticket?.ticket?.id, 
       });
 
       Swal.fire({
@@ -36,7 +36,7 @@ export default function TicketRatingModal({ isOpen, onClose, ticket, onNext }) {
         timer: 2000,
         showConfirmButton: false,
       }).then(() => {
-        onNext(); // pasa al siguiente ticket
+        onNext(); 
       });
 
     } catch (error) {
