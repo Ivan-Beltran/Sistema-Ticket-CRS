@@ -126,7 +126,7 @@ class DashboardService
             ->when($from, fn($q) => $q->whereDate('creation_date', '>=', $from))
             ->when($to,   fn($q) => $q->whereDate('creation_date', '<=', $to))
             ->whereNull('tickets.deleted_at')
-            ->groupBy('priorities.name', 'priorities.color')
+            ->groupBy('priorities.name', 'priorities.color', 'priorities.level')
             ->orderBy('priorities.level')
             ->get()
             ->map(fn($r) => [
