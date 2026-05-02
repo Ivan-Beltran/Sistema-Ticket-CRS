@@ -25,9 +25,7 @@ export default function AgentDashboard() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showUnresolvedModal, setShowUnresolvedModal] = useState(false);
     const [unresolvedData, setUnresolvedData] = useState({
-        avances: '',
-        justificacion: '',
-        adjuntos: []
+        internal_note: ''
     });
     const [validationErrors, setValidationErrors] = useState({});
 
@@ -136,19 +134,14 @@ export default function AgentDashboard() {
             
             setIsSubmitting(true);
             const formData = new FormData();
-            formData.append('avances', unresolvedData.avances);
-            formData.append('justificacion', unresolvedData.justificacion);
-            
-            unresolvedData.adjuntos.forEach(file => {
-                formData.append('adjuntos[]', file);
-            });
+            formData.append('internal_note', unresolvedData.internal_note);
 
             await axios.post(`/agent/ticket/${selectedTicketId}/no-resolver`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
 
             toast.success('Reporte de incidencia enviado con éxito');
-            setUnresolvedData({ avances: '', justificacion: '', adjuntos: [] });
+            setUnresolvedData({ internal_note: '' });
             setShowUnresolvedModal(false);
             setSelectedTicketId(null);
             setShowDiagnosticPanel(false);
@@ -828,62 +821,16 @@ export default function AgentDashboard() {
                         
                         <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Avances Realizados</label>
+                                <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Nota Interna (Justificación / Avances)</label>
                                 <textarea
-                                    className={`w-full h-24 rounded-xl border text-sm p-4 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${validationErrors.avances ? 'border-red-500 bg-red-50' : 'border-slate-200'}`}
-                                    placeholder="Describa qué acciones se intentaron realizar..."
-                                    value={unresolvedData.avances}
-                                    onChange={(e) => setUnresolvedData({...unresolvedData, avances: e.target.value})}
+                                    className={`w-full h-32 rounded-xl border text-sm p-4 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${validationErrors.internal_note ? 'border-red-500 bg-red-50' : 'border-slate-200'}`}
+                                    placeholder="Describa los avances realizados y la justificación de por qué no se pudo resolver el ticket..."
+                                    value={unresolvedData.internal_note}
+                                    onChange={(e) => setUnresolvedData({...unresolvedData, internal_note: e.target.value})}
                                 ></textarea>
-                                {validationErrors.avances && (
-                                    <p className="mt-1 text-[10px] font-bold text-red-600">{validationErrors.avances[0]}</p>
+                                {validationErrors.internal_note && (
+                                    <p className="mt-1 text-[10px] font-bold text-red-600">{validationErrors.internal_note[0]}</p>
                                 )}
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Justificación Técnica</label>
-                                <textarea
-                                    className={`w-full h-24 rounded-xl border text-sm p-4 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all ${validationErrors.justificacion ? 'border-red-500 bg-red-50' : 'border-slate-200'}`}
-                                    placeholder="Explique el motivo por el cual no se pudo resolver..."
-                                    value={unresolvedData.justificacion}
-                                    onChange={(e) => setUnresolvedData({...unresolvedData, justificacion: e.target.value})}
-                                ></textarea>
-                                {validationErrors.justificacion && (
-                                    <p className="mt-1 text-[10px] font-bold text-red-600">{validationErrors.justificacion[0]}</p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Evidencias del Proceso (Fotos/Videos/Logs)</label>
-                                <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-xl transition-colors ${validationErrors['adjuntos.0'] ? 'border-red-500 bg-red-50' : 'border-slate-300 hover:border-red-400'}`}>
-                                    <div className="space-y-1 text-center">
-                                        <div className="flex text-sm text-slate-600">
-                                            <label className="relative cursor-pointer bg-white rounded-md font-medium text-red-600 hover:text-red-500 focus-within:outline-none">
-                                                <span>Subir archivos</span>
-                                                <input 
-                                                    type="file" 
-                                                    className="sr-only" 
-                                                    multiple
-                                                    onChange={(e) => {
-                                                        if (e.target.files) {
-                                                            setUnresolvedData({...unresolvedData, adjuntos: Array.from(e.target.files)});
-                                                        }
-                                                    }}
-                                                />
-                                            </label>
-                                            <p className="pl-1">o arrastrar y soltar</p>
-                                        </div>
-                                        <p className="text-xs text-slate-500">PNG, JPG, PDF, MP4 hasta 10MB</p>
-                                        {unresolvedData.adjuntos.length > 0 && (
-                                            <p className="text-xs font-bold text-red-600 mt-2">
-                                                {unresolvedData.adjuntos.length} archivos seleccionados
-                                            </p>
-                                        )}
-                                        {validationErrors['adjuntos.0'] && (
-                                            <p className="mt-1 text-[10px] font-bold text-red-600">{validationErrors['adjuntos.0'][0]}</p>
-                                        )}
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
@@ -892,7 +839,7 @@ export default function AgentDashboard() {
                                 className="flex-1 rounded-xl bg-white border border-slate-200 py-3 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-50"
                                 onClick={() => {
                                     setShowUnresolvedModal(false);
-                                    setUnresolvedData({ avances: '', justificacion: '', adjuntos: [] });
+                                    setUnresolvedData({ internal_note: '' });
                                 }}
                                 disabled={isSubmitting}
                             >

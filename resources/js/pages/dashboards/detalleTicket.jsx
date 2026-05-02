@@ -271,33 +271,12 @@ export default function TicketDetails({ id }) {
                                             </span>
                                         </div>
                                         
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div>
-                                                <h5 className="text-[11px] font-bold text-red-700 uppercase mb-2">Avances Realizados</h5>
-                                                <div className="text-xs text-slate-700 bg-white/80 p-3 rounded-lg border border-red-50 shadow-sm leading-relaxed whitespace-pre-wrap">
-                                                    {inc.avances}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <h5 className="text-[11px] font-bold text-red-800 uppercase mb-2">Justificación Técnica</h5>
-                                                <div className="text-xs text-slate-700 bg-white/80 p-3 rounded-lg border border-red-100 shadow-sm leading-relaxed whitespace-pre-wrap font-medium italic">
-                                                    "{inc.justificacion}"
-                                                </div>
+                                        <div className="mt-4">
+                                            <h5 className="text-[11px] font-bold text-red-800 uppercase mb-2">Nota Interna</h5>
+                                            <div className="text-xs text-slate-700 bg-white/80 p-3 rounded-lg border border-red-100 shadow-sm leading-relaxed whitespace-pre-wrap font-medium italic">
+                                                "{inc.internal_note}"
                                             </div>
                                         </div>
-                                        
-                                        {inc.adjuntos && inc.adjuntos.length > 0 && (
-                                            <div className="mt-6 pt-4 border-t border-red-100">
-                                                <h5 className="text-[11px] font-bold text-red-700 uppercase mb-3 flex items-center gap-2">
-                                                    <Paperclip className="w-3 h-3" /> Evidencias de Incidencia
-                                                </h5>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    {inc.adjuntos.map((adj, sIdx) => (
-                                                        <AttachmentPreview key={sIdx} adj={adj} />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
                                         
                                         <div className="mt-4 flex items-center justify-end text-[10px] text-slate-400 font-medium">
                                             Reportado por: {inc.tecnico}
