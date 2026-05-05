@@ -11,6 +11,8 @@ use App\Http\Controllers\TecnicoController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\QualificationController;
 use App\Http\Controllers\SolutionTypeController;
+use App\Http\Controllers\DashboardController;
+
 
 // ==========================================
 // 1. RUTAS PÚBLICAS
@@ -24,9 +26,10 @@ Route::get('/faqs', [PublicController::class, 'faqs'])->name('faqs.index');
 Route::middleware(['auth'])->group(function () {
 
     // --- A. DASHBOARD PRINCIPAL ---
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Route::get('dashboard', function () {
+    //     return Inertia::render('dashboard');
+    // })->name('dashboard');
 
    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
@@ -85,16 +88,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/ver-ticket/{id}', [TecnicoController::class, 'verTicket']);
         Route::post('/ticket/{id}/diagnostico', [TecnicoController::class, 'guardarDiagnostico']);
         Route::post('/ticket/{id}/no-resolver', [TecnicoController::class, 'noPuedeResolver']);
-        
-        // Rutas para tipos de diagnóstico
-        Route::get('/solution-types', [SolutionTypeController::class, 'index']);
-        Route::get('/solution-types/department/{departmentId}', [SolutionTypeController::class, 'getByDepartment']);
-        Route::get('/solution-types/help-topic/{helpTopicId}', [SolutionTypeController::class, 'getByHelpTopic']);
-        
-        // Ruta para obtener help topics
-        Route::get('/help-topics', function () {
-            return response()->json(\App\Models\HelpTopic::all(['id', 'name_topic']));
-        });
     });
 
     // --- E. CATÁLOGOS (solo usuarios con permiso) ---
@@ -107,8 +100,6 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['permission:manage_users'])->group(function () {
         Route::resource('users', UserController::class);
     });
-
-    Route::post('/qualifications', [QualificationController::class, 'store']);
 });
 
 // ==========================================
